@@ -1,213 +1,243 @@
-import math
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Dict, List, Optional, Union, Literal
+import numpy as np
+from numpy.typing import NDArray
 
-class ETGriddedValues:
-    """
-    Python translation of the Fortran module et__gridded_values.
-    """
-    def __init__(self):
-        # Placeholder for ET grid data
-        self.ET_GRID = None
+@dataclass
+class HargreavesSamaniParams:
+    """Parameters for Hargreaves-Samani ET calculation"""
+    et_slope: float = 0.0023    # Slope coefficient
+    et_exponent: float = 0.5    # Temperature range exponent
+    et_constant: float = 17.8   # Temperature constant
 
-    def initialize(self, grid_shape, default_value=0.0):
+@dataclass
+class JensenHaiseParams:
+    """Parameters for Jensen-Haise ET calculation"""
+    as_coef: float = 0.25      # Solar radiation coefficient a
+    bs_coef: float = 0.50      # Solar radiation coefficient b
+    ct_coef: float = 0.014     # Temperature coefficient
+    tx_coef: float = -0.37     # Temperature constant
+
+@dataclass
+class GriddedETParams:
+    """Parameters for gridded ET values"""
+    et_zones: NDArray[np.int32]
+    et_ratios: NDArray[np.float32]
+    monthly_ratios: Dict[int, List[float]]  # Zone ID -> monthly ratios
+
+class PotentialETCalculator:
+    """Calculator for potential evapotranspiration using various methods"""
+    
+    def __init__(self, domain_size: int, method: Literal["hargreaves", "jensen_haise", "gridded"] = "hargreaves"):
+        """Initialize ET calculator
+        
+        Args:
+            domain_size: Number of cells in model domain
+            method: ET calculation method to use
         """
-        Initializes the ET grid with default values.
-
-        Parameters:
-        - grid_shape (tuple): Shape of the 2D ET grid (rows, cols).
-        - default_value (float): Default ET value for each grid cell.
+        if method not in ["hargreaves", "jensen_haise", "gridded"]:
+            raise ValueError("method must be one of: 'hargreaves', 'jensen_haise', 'gridded'")
+            
+        self.method = method
+        self.domain_size = domain_size
+        
+        # Initialize arrays
+        self.reference_et0 = np.zeros(domain_size, dtype=np.float32)
+        self.latitude = np.zeros(domain_size, dtype=np.float32)
+        
+        # Parameters for different methods
+        self.hargreaves_params = HargreavesSamaniParams()
+        self.jensen_haise_params = JensenHaiseParams()
+        self.gridded_params: Optional[GriddedETParams] = None
+        
+    def initialize_gridded(self, et_zones: NDArray[np.int32], 
+                         monthly_ratios: Dict[int, List[float]]) -> None:
+        """Initialize gridded ET parameters
+        
+        Args:
+            et_zones: Array mapping cells to ET zones
+            monthly_ratios: Dictionary mapping zone IDs to monthly ET ratios
         """
-        self.ET_GRID = [[default_value for _ in range(grid_shape[1])] for _ in range(grid_shape[0])]
-
-    def calculate(self, daily_values, active_grid):
-        """
-        Calculates potential ET by substituting daily average ET values.
-
-        Parameters:
-        - daily_values (list of lists): A 2D list of daily ET values matching the grid.
-        - active_grid (list of lists): A 2D boolean grid indicating active cells.
-
-        Returns:
-        - Updated ET grid with calculated values.
-        """
-        for i in range(len(self.ET_GRID)):
-            for j in range(len(self.ET_GRID[0])):
-                if active_grid[i][j]:
-                    self.ET_GRID[i][j] = daily_values[i][j]
-        return self.ET_GRID
-
-class ETHargreavesSamani:
-    """
-    Python translation of the Fortran module et__hargreaves_samani with extraterrestrial radiation calculation.
-    """
-    def __init__(self):
-        # Constants for the Hargreaves-Samani equation
-        self.KRS = 0.0023  # Empirical coefficient (Hargreaves constant)
-        self.GSC = 0.0820  # Solar constant (MJ/m²/min)
-
-    @staticmethod
-    def solar_declination(day_of_year):
-        """
-        Calculates the solar declination angle (radians).
-
-        Parameters:
-        - day_of_year (int): Day of the year (1 to 365).
-
-        Returns:
-        - delta (float): Solar declination (radians).
-        """
-        return 0.409 * math.sin(2 * math.pi * day_of_year / 365 - 1.39)
-
-    @staticmethod
-    def inverse_relative_distance(day_of_year):
-        """
-        Calculates the inverse relative distance Earth-Sun.
-
-        Parameters:
-        - day_of_year (int): Day of the year (1 to 365).
-
-        Returns:
-        - dr (float): Inverse relative distance Earth-Sun.
-        """
-        return 1 + 0.033 * math.cos(2 * math.pi * day_of_year / 365)
-
-    @staticmethod
-    def sunset_hour_angle(latitude, solar_declination):
-        """
-        Calculates the sunset hour angle (radians).
-
-        Parameters:
-        - latitude (float): Latitude in radians.
-        - solar_declination (float): Solar declination angle (radians).
-
-        Returns:
-        - omega_s (float): Sunset hour angle (radians).
-        """
-        return math.acos(-math.tan(latitude) * math.tan(solar_declination))
-
-    def extraterrestrial_radiation(self, latitude, day_of_year):
-        """
-        Calculates extraterrestrial radiation (Ra).
-
-        Parameters:
-        - latitude (float): Latitude in degrees.
-        - day_of_year (int): Day of the year (1 to 365).
-
-        Returns:
-        - Ra (float): Extraterrestrial radiation (MJ/m²/day).
-        """
-        # Convert latitude to radians
-        phi = math.radians(latitude)
-        # Calculate solar parameters
-        delta = self.solar_declination(day_of_year)
-        dr = self.inverse_relative_distance(day_of_year)
-        omega_s = self.sunset_hour_angle(phi, delta)
-        # Calculate Ra
-        Ra = (
-            (24 * 60 / math.pi) * self.GSC * dr *
-            (omega_s * math.sin(phi) * math.sin(delta) +
-             math.cos(phi) * math.cos(delta) * math.sin(omega_s))
+        if self.method != "gridded":
+            raise ValueError("Can only initialize gridded parameters when using gridded method")
+            
+        # Initialize ratios array
+        et_ratios = np.zeros(self.domain_size, dtype=np.float32)
+        
+        # Set initial ratios from first month
+        for zone_id, ratios in monthly_ratios.items():
+            mask = et_zones == zone_id
+            et_ratios[mask] = ratios[0]  # January ratio
+            
+        self.gridded_params = GriddedETParams(
+            et_zones=et_zones,
+            et_ratios=et_ratios,
+            monthly_ratios=monthly_ratios
         )
-        return Ra
-
-    def calculate_et(self, tmin, tmax, tmean, latitude, day_of_year):
-        """
-        Calculates potential ET using the Hargreaves-Samani method.
-
-        Parameters:
-        - tmin (float): Minimum temperature (°C).
-        - tmax (float): Maximum temperature (°C).
-        - tmean (float): Mean temperature (°C).
-        - latitude (float): Latitude in degrees.
-        - day_of_year (int): Day of the year (1 to 365).
-
+        
+    def _calculate_solar_parameters(self, day_of_year: int,
+                                  days_in_year: int = 365) -> tuple[float, float, float]:
+        """Calculate solar radiation parameters
+        
+        Args:
+            day_of_year: Day of year (1-365/366)
+            days_in_year: Number of days in year
+            
         Returns:
-        - ET_o (float): Reference evapotranspiration (mm/day).
+            Tuple of (relative distance, declination, sunset angle)
         """
+        # Relative earth-sun distance
+        dr = 1.0 + 0.033 * np.cos(2.0 * np.pi * day_of_year / days_in_year)
+        
+        # Solar declination
+        delta = 0.409 * np.sin(2.0 * np.pi * day_of_year / days_in_year - 1.39)
+        
+        # Sunset hour angle
+        omega_s = np.arccos(-np.tan(self.latitude) * np.tan(delta))
+        
+        return dr, delta, omega_s
+        
+    def _calculate_extraterrestrial_radiation(self, dr: float, delta: float, 
+                                            omega_s: float) -> NDArray[np.float32]:
+        """Calculate extraterrestrial radiation
+        
+        Args:
+            dr: Relative earth-sun distance
+            delta: Solar declination
+            omega_s: Sunset hour angle
+            
+        Returns:
+            Array of extraterrestrial radiation values
+        """
+        # Solar constant
+        gsc = 0.0820  # MJ/m^2/min
+        
+        # Convert latitude to radians for calculation
+        lat_rad = np.deg2rad(self.latitude)
+        
+        # Calculate Ra (MJ/m^2/day)
+        ra = (24.0 * 60.0 / np.pi * gsc * dr * 
+              (omega_s * np.sin(lat_rad) * np.sin(delta) +
+               np.cos(lat_rad) * np.cos(delta) * np.sin(omega_s)))
+        
+        return ra
+        
+    def calculate_hargreaves(self, day_of_year: int, tmin: NDArray[np.float32],
+                           tmax: NDArray[np.float32]) -> None:
+        """Calculate reference ET using Hargreaves-Samani method
+        
+        Args:
+            day_of_year: Day of year (1-365/366)
+            tmin: Minimum temperature array (°F)
+            tmax: Maximum temperature array (°F)
+        """
+        # Calculate mean temperature
+        tmean = (tmax + tmin) / 2.0
+        
+        # Calculate temperature range
+        tdelta = np.abs(tmax - tmin)
+        
+        # Get solar parameters
+        dr, delta, omega_s = self._calculate_solar_parameters(day_of_year)
+        
         # Calculate extraterrestrial radiation
-        Ra = self.extraterrestrial_radiation(latitude, day_of_year)
-
-        # Apply Hargreaves-Samani equation
-        delta_t = tmax - tmin  # Temperature difference
-        et_o = self.KRS * Ra * (tmean + 17.8) * (delta_t ** 0.5)
-
-        return et_o
-
-class ETJensenHaise:
-    """
-    Python translation of the Fortran module et__jensen_haise.
-    """
-    def __init__(self, base_temperature=0.0, coefficient=0.025):
+        ra = self._calculate_extraterrestrial_radiation(dr, delta, omega_s)
+        
+        # Convert temperatures to Celsius
+        tmean_c = (tmean - 32.0) * 5.0/9.0
+        
+        # Calculate reference ET (inches/day)
+        self.reference_et0 = (self.hargreaves_params.et_slope * ra * 
+                            (tmean_c + self.hargreaves_params.et_constant) * 
+                            (tdelta ** self.hargreaves_params.et_exponent) / 25.4)  # Convert mm to inches
+        
+        # Ensure non-negative values
+        self.reference_et0 = np.maximum(self.reference_et0, 0.0)
+        
+    def calculate_jensen_haise(self, day_of_year: int, tmin: NDArray[np.float32],
+                             tmax: NDArray[np.float32], sun_pct: Optional[NDArray[np.float32]] = None) -> None:
+        """Calculate reference ET using Jensen-Haise method
+        
+        Args:
+            day_of_year: Day of year (1-365/366)
+            tmin: Minimum temperature array (°F)
+            tmax: Maximum temperature array (°F)
+            sun_pct: Optional percent of possible sunshine
         """
-        Initializes the Jensen-Haise ET calculation parameters.
-
-        Parameters:
-        - base_temperature (float): Base temperature (\( T_b \)) in °C. Default is 0.0.
-        - coefficient (float): Empirical coefficient (\( C \)) in mm/MJ. Default is 0.025.
+        # Calculate mean temperature
+        tmean = (tmax + tmin) / 2.0
+        
+        # Estimate sunshine percentage if not provided
+        if sun_pct is None:
+            sun_pct = 1.0 - ((tmax - tmin) / 20.0)  # Simple estimation
+            sun_pct = np.clip(sun_pct, 0.3, 1.0)
+        
+        # Get solar parameters
+        dr, delta, omega_s = self._calculate_solar_parameters(day_of_year)
+        
+        # Calculate extraterrestrial radiation
+        ra = self._calculate_extraterrestrial_radiation(dr, delta, omega_s)
+        
+        # Calculate solar radiation
+        rs = ra * (self.jensen_haise_params.as_coef + 
+                  self.jensen_haise_params.bs_coef * sun_pct)
+        
+        # Convert mean temperature to Celsius
+        tmean_c = (tmean - 32.0) * 5.0/9.0
+        
+        # Calculate reference ET (inches/day)
+        self.reference_et0 = ((self.jensen_haise_params.ct_coef * tmean_c + 
+                             self.jensen_haise_params.tx_coef) * rs / 25.4)  # Convert mm to inches
+        
+        # Set to zero when temperature is below freezing
+        self.reference_et0[tmean <= 32.0] = 0.0
+        
+    def update_gridded(self, date: datetime, base_et: NDArray[np.float32]) -> None:
+        """Update reference ET using gridded values/ratios
+        
+        Args:
+            date: Current simulation date
+            base_et: Base ET values to modify by ratios
         """
-        self.T_b = base_temperature  # Base temperature (°C)
-        self.C = coefficient  # Empirical coefficient (mm/MJ)
-
-    def calculate_et(self, tmean, solar_radiation):
-        """
-        Calculates potential ET using the Jensen-Haise method.
-
-        Parameters:
-        - tmean (float): Mean temperature (\( T_{mean} \)) in °C.
-        - solar_radiation (float): Solar radiation (\( R_s \)) in MJ/m²/day.
-
+        if self.gridded_params is None:
+            raise RuntimeError("Gridded parameters must be initialized first")
+            
+        # Update ratios on first day of month
+        if date.day == 1:
+            month_idx = date.month - 1  # Convert to 0-based index
+            
+            for zone_id, monthly_ratios in self.gridded_params.monthly_ratios.items():
+                mask = self.gridded_params.et_zones == zone_id
+                self.gridded_params.et_ratios[mask] = monthly_ratios[month_idx]
+                
+        # Apply ratios to base ET
+        self.reference_et0 = base_et * self.gridded_params.et_ratios
+        
+    def calculate(self, date: datetime, tmin: NDArray[np.float32],
+                 tmax: NDArray[np.float32], base_et: Optional[NDArray[np.float32]] = None,
+                 sun_pct: Optional[NDArray[np.float32]] = None) -> NDArray[np.float32]:
+        """Calculate reference ET using selected method
+        
+        Args:
+            date: Current simulation date
+            tmin: Minimum temperature array
+            tmax: Maximum temperature array
+            base_et: Optional base ET for gridded method
+            sun_pct: Optional percent possible sunshine for Jensen-Haise
+            
         Returns:
-        - ET_o (float): Reference evapotranspiration (mm/day).
+            Array of reference ET values
         """
-        if tmean > self.T_b:
-            return self.C * solar_radiation * (tmean - self.T_b)
-        else:
-            return 0.0
-
-class ETZoneValues:
-    """
-    Python translation of the Fortran module et__zone_values.
-    """
-    def __init__(self):
-        # Placeholder for ET table values and ratios
-        self.ET_TABLE_VALUES = None  # 2D table of ET values by zone and time
-        self.ET_ZONE = None  # Array of zone identifiers
-        self.ET_RATIOS = None  # Ratios for ET adjustment
-
-    def initialize(self, num_zones, num_timesteps, default_value=0.0, default_ratio=1.0):
-        """
-        Initializes the ET table, zone identifiers, and ratios.
-
-        Parameters:
-        - num_zones (int): Number of zones.
-        - num_timesteps (int): Number of timesteps in the ET table.
-        - default_value (float): Default ET value for each zone and timestep.
-        - default_ratio (float): Default ET ratio for each zone.
-        """
-        self.ET_TABLE_VALUES = [[default_value for _ in range(num_timesteps)] for _ in range(num_zones)]
-        self.ET_ZONE = [0] * num_zones  # Initialize zone identifiers to 0
-        self.ET_RATIOS = [default_ratio] * num_zones
-
-    def calculate(self, zone_ids, timestep):
-        """
-        Calculates ET values for a given timestep based on zone IDs and ET ratios.
-
-        Parameters:
-        - zone_ids (list of int): List of zone identifiers for each grid cell.
-        - timestep (int): The current timestep.
-
-        Returns:
-        - et_values (list): List of ET values for each grid cell.
-        """
-        if timestep >= len(self.ET_TABLE_VALUES[0]):
-            raise ValueError("Timestep out of range.")
-
-        et_values = []
-        for zone_id in zone_ids:
-            if zone_id < 0 or zone_id >= len(self.ET_TABLE_VALUES):
-                et_value = 0.0  # Default ET value for invalid zone IDs
-            else:
-                et_value = self.ET_TABLE_VALUES[zone_id][timestep] * self.ET_RATIOS[zone_id]
-            et_values.append(et_value)
-
-        return et_values
-
+        day_of_year = date.timetuple().tm_yday
+        
+        if self.method == "hargreaves":
+            self.calculate_hargreaves(day_of_year, tmin, tmax)
+        elif self.method == "jensen_haise":
+            self.calculate_jensen_haise(day_of_year, tmin, tmax, sun_pct)
+        elif self.method == "gridded":
+            if base_et is None:
+                raise ValueError("base_et must be provided when using gridded method")
+            self.update_gridded(date, base_et)
+            
+        return self.reference_et0
