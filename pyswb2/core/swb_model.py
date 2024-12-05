@@ -129,7 +129,6 @@ class SWBModel:
         self.parameters = Parameters()
         self.data_flow = ModelDataFlow()
         self.logger = ParameterLogger()
-        self.precipitation = Precipitation(grid_shape=self.grid.grid_shape)
         
     def initialize(self, config_path: Path) -> None:
         # Load and validate configuration
