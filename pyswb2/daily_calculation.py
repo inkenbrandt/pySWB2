@@ -21,6 +21,9 @@ class DailyCalculation:
         Args:
             date: Current simulation date
         """
+        # Update domain's current date
+        self.domain.current_date = date
+
         # 1. Partition precipitation into rain and snow
         self._partition_precipitation()
 

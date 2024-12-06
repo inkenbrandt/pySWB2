@@ -122,50 +122,60 @@ class InterceptionModule:
         total_input = rainfall + fog
 
         for landuse_id, params in self.gash_params.items():
+            # Create mask for this landuse type
             mask = (self.landuse_indices == landuse_id)
             if not np.any(mask):
                 continue
 
-            # Calculate saturation precipitation
+            # Get total input for just this landuse type
+            masked_input = total_input[mask]
+
+            # Calculate saturation precipitation for just these cells
             p_sat = self._calc_precipitation_at_saturation(
                 self.evap_to_rain_ratio[mask],
                 params.canopy_storage_capacity,
                 self.canopy_cover_fraction[mask]
             )
 
-            # Get masked inputs
-            cell_input = total_input[mask]
+            # Create condition masks for just these cells
+            below_sat_local = masked_input < p_sat
+            above_trunk_local = masked_input > (params.trunk_storage_capacity /
+                                                (params.stemflow_fraction + 1e-6))
+            between_local = ~(below_sat_local | above_trunk_local)
 
-            # Create masks for different conditions within this landuse type
-            below_sat = cell_input < p_sat
-            above_trunk = cell_input > (params.trunk_storage_capacity /
-                                        (params.stemflow_fraction + 1e-6))
-            between = ~(below_sat | above_trunk)
+            # Convert local condition masks back to full domain size
+            temp_mask = np.zeros_like(mask)
+            temp_mask[mask] = below_sat_local
+            below_sat = temp_mask
 
-            # Calculate interception for cells below saturation
-            masked_indices = mask & below_sat
-            self.interception[masked_indices] = (
-                    self.canopy_cover_fraction[masked_indices] * total_input[masked_indices]
+            temp_mask = np.zeros_like(mask)
+            temp_mask[mask] = above_trunk_local
+            above_trunk = temp_mask
+
+            temp_mask = np.zeros_like(mask)
+            temp_mask[mask] = between_local
+            between = temp_mask
+
+            # Calculate interception for each condition
+            self.interception[mask & below_sat] = (
+                    self.canopy_cover_fraction[mask & below_sat] *
+                    total_input[mask & below_sat]
             )
 
-            # Calculate interception for cells above trunk storage capacity
-            masked_indices = mask & above_trunk
-            self.interception[masked_indices] = (
-                    self.canopy_cover_fraction[masked_indices] * p_sat[above_trunk] +
-                    self.canopy_cover_fraction[masked_indices] *
-                    self.evap_to_rain_ratio[masked_indices] *
-                    (total_input[masked_indices] - p_sat[above_trunk]) +
+            self.interception[mask & above_trunk] = (
+                    self.canopy_cover_fraction[mask & above_trunk] * p_sat[above_trunk_local] +
+                    self.canopy_cover_fraction[mask & above_trunk] *
+                    self.evap_to_rain_ratio[mask & above_trunk] *
+                    (total_input[mask & above_trunk] - p_sat[above_trunk_local]) +
                     params.trunk_storage_capacity
             )
 
-            # Calculate interception for cells between saturation and trunk storage
-            masked_indices = mask & between
-            self.interception[masked_indices] = (
-                    self.canopy_cover_fraction[masked_indices] * p_sat[between] +
-                    self.canopy_cover_fraction[masked_indices] *
-                    self.evap_to_rain_ratio[masked_indices] *
-                    (total_input[masked_indices] - p_sat[between]) +
-                    params.stemflow_fraction * total_input[masked_indices]
+            self.interception[mask & between] = (
+                    self.canopy_cover_fraction[mask & between] * p_sat[between_local] +
+                    self.canopy_cover_fraction[mask & between] *
+                    self.evap_to_rain_ratio[mask & between] *
+                    (total_input[mask & between] - p_sat[between_local]) +
+                    params.stemflow_fraction * total_input[mask & between]
             )
             
     def _calculate_bucket_interception(self, rainfall: NDArray[np.float32],

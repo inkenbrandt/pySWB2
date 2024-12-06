@@ -85,6 +85,8 @@ class ModelDomain:
         self.outspecs: Dict[OutputType, OutputSpec] = {}
         self._initialize_output_specs()
 
+        self.current_date = None
+
     def _initialize_output_specs(self):
         """Initialize output specifications with default values"""
         self.outspecs[OutputType.GROSS_PRECIPITATION] = OutputSpec(
@@ -138,9 +140,11 @@ class ModelDomain:
         self.surface_storage = None
         self.snow_storage = None
         self.interception_storage = None
+        self.interception_storage_max = None  # Add max interception storage
         self.gross_precip = None
         self.rainfall = None
         self.snowfall = None
+        self.snowmelt = None
         self.runoff = None
         self.runon = None
         self.infiltration = None
@@ -150,7 +154,52 @@ class ModelDomain:
         self.tmin = None
         self.tmax = None
         self.tmean = None
-        self.fog = None  # Add fog array
+        self.fog = None
+        self.interception = None  # Add interception array
+        self.direct_soil_moisture = None  # Add direct soil moisture array
+        self.wilting_point = None  # Also need wilting point
+        self.field_capacity = None  # And field capacity
+
+    def _initialize_domain_arrays(self):
+        """Initialize all domain arrays to proper size"""
+        n_active = np.count_nonzero(self.active)
+
+        # Initialize arrays
+        self.landuse_code = np.zeros(n_active, dtype=np.int32)
+        self.landuse_index = np.zeros(n_active, dtype=np.int32)
+        self.soil_group = np.zeros(n_active, dtype=np.int32)
+
+        # Water storages
+        self.soil_storage = np.zeros(n_active, dtype=np.float32)
+        self.soil_storage_max = np.zeros(n_active, dtype=np.float32)
+        self.surface_storage = np.zeros(n_active, dtype=np.float32)
+        self.snow_storage = np.zeros(n_active, dtype=np.float32)
+        self.interception_storage = np.zeros(n_active, dtype=np.float32)
+        self.interception_storage_max = np.zeros(n_active, dtype=np.float32)
+
+        # Water fluxes
+        self.gross_precip = np.zeros(n_active, dtype=np.float32)
+        self.rainfall = np.zeros(n_active, dtype=np.float32)
+        self.snowfall = np.zeros(n_active, dtype=np.float32)
+        self.snowmelt = np.zeros(n_active, dtype=np.float32)
+        self.runoff = np.zeros(n_active, dtype=np.float32)
+        self.runon = np.zeros(n_active, dtype=np.float32)
+        self.infiltration = np.zeros(n_active, dtype=np.float32)
+        self.net_infiltration = np.zeros(n_active, dtype=np.float32)
+        self.fog = np.zeros(n_active, dtype=np.float32)
+        self.interception = np.zeros(n_active, dtype=np.float32)  # Initialize interception array
+        self.direct_soil_moisture = np.zeros(n_active, dtype=np.float32)  # Initialize direct soil moisture
+
+        # Soil properties
+        self.wilting_point = np.zeros(n_active, dtype=np.float32)  # Initialize wilting point
+        self.field_capacity = np.zeros(n_active, dtype=np.float32)  # Initialize field capacity
+
+        # Energy and ET
+        self.reference_et0 = np.zeros(n_active, dtype=np.float32)
+        self.actual_et = np.zeros(n_active, dtype=np.float32)
+        self.tmin = np.zeros(n_active, dtype=np.float32)
+        self.tmax = np.zeros(n_active, dtype=np.float32)
+        self.tmean = np.zeros(n_active, dtype=np.float32)
 
     def initialize_grid(self, nx: int, ny: int, x_ll: float, y_ll: float, 
                        cell_size: float, proj4: str = ""):
@@ -178,39 +227,6 @@ class ModelDomain:
         
         # Initialize state arrays with proper size
         self._initialize_domain_arrays()
-
-    def _initialize_domain_arrays(self):
-        """Initialize all domain arrays to proper size"""
-        n_active = np.count_nonzero(self.active)
-        
-        # Initialize arrays
-        self.landuse_code = np.zeros(n_active, dtype=np.int32)
-        self.landuse_index = np.zeros(n_active, dtype=np.int32)
-        self.soil_group = np.zeros(n_active, dtype=np.int32)
-        
-        # Water storages
-        self.soil_storage = np.zeros(n_active, dtype=np.float32)
-        self.soil_storage_max = np.zeros(n_active, dtype=np.float32)
-        self.surface_storage = np.zeros(n_active, dtype=np.float32)
-        self.snow_storage = np.zeros(n_active, dtype=np.float32)
-        self.interception_storage = np.zeros(n_active, dtype=np.float32)
-        
-        # Water fluxes
-        self.gross_precip = np.zeros(n_active, dtype=np.float32)
-        self.rainfall = np.zeros(n_active, dtype=np.float32)
-        self.snowfall = np.zeros(n_active, dtype=np.float32)
-        self.runoff = np.zeros(n_active, dtype=np.float32)
-        self.runon = np.zeros(n_active, dtype=np.float32)
-        self.infiltration = np.zeros(n_active, dtype=np.float32)
-        self.net_infiltration = np.zeros(n_active, dtype=np.float32)
-        self.fog = np.zeros(n_active, dtype=np.float32)  # Initialize fog array
-        
-        # Energy and ET
-        self.reference_et0 = np.zeros(n_active, dtype=np.float32)
-        self.actual_et = np.zeros(n_active, dtype=np.float32)
-        self.tmin = np.zeros(n_active, dtype=np.float32)
-        self.tmax = np.zeros(n_active, dtype=np.float32)
-        self.tmean = np.zeros(n_active, dtype=np.float32)
 
     def initialize_parameters(self, landuse_params: Dict[int, Dict], 
                             soil_params: Dict[int, Dict]) -> None:
@@ -295,6 +311,8 @@ class ModelDomain:
         Args:
             date: Current simulation date
         """
+        self.current_date = date
+
         # Update agricultural conditions
         self.agriculture_module.process_daily(
             date, self.tmean, self.tmin, self.tmax
@@ -336,4 +354,12 @@ class ModelDomain:
             self.soil_storage_max,
             self.infiltration,
             self.reference_et0
+        )
+
+    def calc_reference_et(self) -> None:
+        """Calculate reference evapotranspiration"""
+        self.reference_et0 = self.potential_et_calculator.calculate(
+            date=self.current_date,  # Need to track current date
+            tmin=self.tmin,
+            tmax=self.tmax
         )
