@@ -8,10 +8,11 @@ import logging
 from .model_domain import ModelDomain
 
 
+
 class DailyCalculation:
     """Class handling daily water balance calculations following documented order"""
 
-    def __init__(self, domain: ModelDomain):
+    def __init__(self, domain):
         self.domain = domain
         self.logger = logging.getLogger('daily_calculation')
 
@@ -21,9 +22,6 @@ class DailyCalculation:
         Args:
             date: Current simulation date
         """
-        # Update domain's current date
-        self.domain.current_date = date
-
         # 1. Partition precipitation into rain and snow
         self._partition_precipitation()
 
@@ -33,8 +31,9 @@ class DailyCalculation:
         # 3. Update snow storage and calculate snowmelt
         self._process_snow()
 
-        # 4. Calculate reference ET
+        # 4. Calculate reference ET and crop ET
         self.domain.calc_reference_et()
+        self.domain.crop_etc = self.domain.reference_et0 * self.domain.crop_coefficient
 
         # 5. Calculate soil moisture balance
         self._process_soil_moisture()
@@ -49,13 +48,12 @@ class DailyCalculation:
     def _partition_precipitation(self) -> None:
         """Partition daily precipitation into rain and snow"""
         # Use mean temperature and daily range to determine precipitation type
-        precip = self.domain.gross_precipitation
         tmean = (self.domain.tmax + self.domain.tmin) / 2.0
         daily_range = (self.domain.tmax - self.domain.tmin) / 3.0
 
         snow_mask = (tmean - daily_range) <= 32.0
-        self.domain.snowfall[snow_mask] = precip[snow_mask]
-        self.domain.rainfall[~snow_mask] = precip[~snow_mask]
+        self.domain.snowfall[snow_mask] = self.domain.gross_precipitation[snow_mask]
+        self.domain.rainfall[~snow_mask] = self.domain.gross_precipitation[~snow_mask]
 
         # Track net amounts after interception
         self.domain.net_snowfall = self.domain.snowfall.copy()
@@ -160,8 +158,8 @@ class DailyCalculation:
             soil_storage=interim_moisture,
             soil_storage_max=self.domain.soil_storage_max,
             infiltration=self.domain.infiltration,
-            reference_et0=self.domain.reference_et0,
-            soil_moisture_fraction=moisture_fraction
+            crop_etc=self.domain.crop_etc,
+            reference_et0=self.domain.reference_et0
         )
 
         # Update soil moisture
@@ -234,3 +232,4 @@ class DailyCalculation:
         # Update crop coefficients if using FAO-56
         if self.domain.use_crop_coefficients:
             self.domain.agriculture_module.update_crop_coefficients()
+

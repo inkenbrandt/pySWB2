@@ -58,7 +58,7 @@ class OutputSpec:
 
 class ModelDomain:
     """Class representing model domain and calculations"""
-    
+
     def __init__(self):
         # Grid properties
         self.number_of_columns: int = 0
@@ -67,25 +67,61 @@ class ModelDomain:
         self.x_ll: float = 0.0
         self.y_ll: float = 0.0
         self.proj4_string: str = ""
-        
+
+        # Routing configuration
+        self.routing_enabled: bool = False
+        self.flow_direction: Optional[NDArray[np.int32]] = None
+        self.flow_sequence: Optional[NDArray[np.int32]] = None
+        self.routing_fraction: Optional[NDArray[np.float32]] = None
+
+        # Time tracking
+        self.current_date: Optional[datetime] = None
+        self.start_date: Optional[datetime] = None
+        self.end_date: Optional[datetime] = None
+
         # Initialize component modules
         self.domain_size = 0  # Will be set in initialize_grid
         self._initialize_modules()
-        
+
         # Masks and indices
         self.active: NDArray[np.bool_] = None
         self.landuse_code: NDArray[np.int32] = None
         self.landuse_index: NDArray[np.int32] = None
         self.soil_group: NDArray[np.int32] = None
-        
+
         # State variables
         self._initialize_state_arrays()
-        
+
+        # Crop growth settings
+        self.dynamic_rooting: bool = False
+        self.use_crop_coefficients: bool = False
+
         # Output specifications
         self.outspecs: Dict[OutputType, OutputSpec] = {}
         self._initialize_output_specs()
 
-        self.current_date = None
+    def initialize_simulation_period(self, start_date: datetime, end_date: datetime) -> None:
+        """Initialize simulation start and end dates
+
+        Args:
+            start_date: Simulation start date
+            end_date: Simulation end date
+        """
+        self.start_date = start_date
+        self.end_date = end_date
+        self.current_date = start_date
+
+    def update_date(self, date: datetime) -> None:
+        """Update current simulation date
+
+        Args:
+            date: Current simulation date
+        """
+        self.current_date = date
+
+        # Update date in all modules that need it
+        if hasattr(self, 'agriculture_module') and self.agriculture_module is not None:
+            self.agriculture_module.current_date = date
 
     def _initialize_output_specs(self):
         """Initialize output specifications with default values"""
@@ -135,12 +171,16 @@ class ModelDomain:
     def _initialize_state_arrays(self):
         """Initialize state tracking arrays"""
         # These will be resized once domain_size is known
-        self.soil_storage = None
-        self.soil_storage_max = None
+        # storage components
         self.surface_storage = None
         self.snow_storage = None
         self.interception_storage = None
         self.interception_storage_max = None  # Add max interception storage
+        self.interception = None  # Add interception array
+        self.soil_storage = None
+        self.soil_storage_max = None
+
+        # precip arrays
         self.gross_precip = None
         self.rainfall = None
         self.snowfall = None
@@ -151,14 +191,27 @@ class ModelDomain:
         self.net_infiltration = None
         self.reference_et0 = None
         self.actual_et = None
+
+        # Energy and ET arrays
+        self.reference_et0 = None
+        self.actual_et = None
         self.tmin = None
         self.tmax = None
         self.tmean = None
         self.fog = None
-        self.interception = None  # Add interception array
+
+        # Crop-related arrays
+        self.crop_coefficient = None  # Current crop coefficient value
+        self.crop_etc = None  # Crop ET under standard conditions
+        self.rooting_depth = None  # Current rooting depth
+        self.max_root_depth = None  # Maximum rooting depth by land use
+
+        # Soil properties
+        self.field_capacity = None  # Field capacity by soil type
+        self.wilting_point = None  # Wilting point by soil type
         self.direct_soil_moisture = None  # Add direct soil moisture array
-        self.wilting_point = None  # Also need wilting point
-        self.field_capacity = None  # And field capacity
+        self.direct_net_infiltration = None  # Added direct net infiltration array
+        self.direct_soil_moisture = None     # Added direct soil moisture array for completeness
 
     def _initialize_domain_arrays(self):
         """Initialize all domain arrays to proper size"""
@@ -190,16 +243,24 @@ class ModelDomain:
         self.interception = np.zeros(n_active, dtype=np.float32)  # Initialize interception array
         self.direct_soil_moisture = np.zeros(n_active, dtype=np.float32)  # Initialize direct soil moisture
 
-        # Soil properties
-        self.wilting_point = np.zeros(n_active, dtype=np.float32)  # Initialize wilting point
-        self.field_capacity = np.zeros(n_active, dtype=np.float32)  # Initialize field capacity
-
         # Energy and ET
         self.reference_et0 = np.zeros(n_active, dtype=np.float32)
         self.actual_et = np.zeros(n_active, dtype=np.float32)
         self.tmin = np.zeros(n_active, dtype=np.float32)
         self.tmax = np.zeros(n_active, dtype=np.float32)
         self.tmean = np.zeros(n_active, dtype=np.float32)
+
+        # Crop and soil parameters
+        self.crop_coefficient = np.ones(n_active, dtype=np.float32)  # Initialize to 1.0
+        self.crop_etc = np.zeros(n_active, dtype=np.float32)
+        self.rooting_depth = np.zeros(n_active, dtype=np.float32)
+        self.max_root_depth = np.zeros(n_active, dtype=np.float32)
+        self.field_capacity = np.zeros(n_active, dtype=np.float32)
+        self.wilting_point = np.zeros(n_active, dtype=np.float32)
+
+        # Direct additions
+        self.direct_net_infiltration = np.zeros(n_active, dtype=np.float32)
+        self.direct_soil_moisture = np.zeros(n_active, dtype=np.float32)
 
     def initialize_grid(self, nx: int, ny: int, x_ll: float, y_ll: float, 
                        cell_size: float, proj4: str = ""):
@@ -358,8 +419,105 @@ class ModelDomain:
 
     def calc_reference_et(self) -> None:
         """Calculate reference evapotranspiration"""
+        if self.current_date is None:
+            raise RuntimeError("Current date must be set before calculating reference ET")
+
         self.reference_et0 = self.potential_et_calculator.calculate(
-            date=self.current_date,  # Need to track current date
+            date=self.current_date,
             tmin=self.tmin,
             tmax=self.tmax
         )
+
+    def initialize_crop_coefficients(self, use_crop_coefficients: bool = False,
+                                     dynamic_rooting: bool = False) -> None:
+        """Initialize crop coefficient settings
+
+        Args:
+            use_crop_coefficients: Whether to use FAO-56 crop coefficients
+            dynamic_rooting: Whether to use dynamic rooting depths
+        """
+        self.use_crop_coefficients = use_crop_coefficients
+        self.dynamic_rooting = dynamic_rooting
+
+        # Initialize crop coefficient to 1.0 if not using FAO-56
+        if not use_crop_coefficients:
+            self.crop_coefficient = np.ones_like(self.crop_coefficient)
+
+    def initialize_routing(self, flow_direction: NDArray[np.int32],
+                           routing_fraction: Optional[NDArray[np.float32]] = None) -> None:
+        """Initialize routing configuration
+
+        Args:
+            flow_direction: Array defining D8 flow direction for each cell
+            routing_fraction: Optional array defining fraction of runoff to route (default 1.0)
+        """
+        if flow_direction.shape != (self.domain_size,):
+            raise ValueError("Flow direction array must match domain size")
+
+        self.flow_direction = flow_direction
+
+        # Default routing fraction to 1.0 if not provided
+        if routing_fraction is None:
+            self.routing_fraction = np.ones(self.domain_size, dtype=np.float32)
+        else:
+            if routing_fraction.shape != (self.domain_size,):
+                raise ValueError("Routing fraction array must match domain size")
+            self.routing_fraction = routing_fraction
+
+        # Create sequence of cells from upslope to downslope
+        self._create_flow_sequence()
+
+        # Enable routing
+        self.routing_enabled = True
+
+    def _create_flow_sequence(self) -> None:
+        """Create sequence of cell indices from upslope to downslope
+
+        This creates an ordered list of cell indices such that each cell
+        appears after all cells that could potentially flow into it.
+        """
+        # Initialize visited flags and sequence
+        n_cells = len(self.flow_direction)
+        visited = np.zeros(n_cells, dtype=bool)
+        sequence = []
+
+        # Process each unvisited cell
+        for i in range(n_cells):
+            if not visited[i]:
+                self._trace_flow_path(i, visited, sequence)
+
+        # Store final sequence
+        self.flow_sequence = np.array(sequence, dtype=np.int32)
+
+    def _trace_flow_path(self, cell: int, visited: NDArray[np.bool_],
+                         sequence: List[int]) -> None:
+        """Recursively trace flow path from a cell
+
+        Args:
+            cell: Current cell index
+            visited: Array tracking visited cells
+            sequence: List to store cell sequence
+        """
+        # Mark current cell as visited
+        visited[cell] = True
+
+        # Get next downslope cell
+        next_cell = self.flow_direction[cell]
+
+        # Follow flow path if valid cell and not already visited
+        if next_cell >= 0 and not visited[next_cell]:
+            self._trace_flow_path(next_cell, visited, sequence)
+
+        # Add current cell to sequence
+        sequence.append(cell)
+
+    def set_crop_options(self, dynamic_rooting: bool = False,
+                         use_crop_coefficients: bool = False) -> None:
+        """Set crop growth calculation options
+
+        Args:
+            dynamic_rooting: Whether to use dynamic root depth calculations
+            use_crop_coefficients: Whether to use FAO-56 crop coefficients
+        """
+        self.dynamic_rooting = dynamic_rooting
+        self.use_crop_coefficients = use_crop_coefficients

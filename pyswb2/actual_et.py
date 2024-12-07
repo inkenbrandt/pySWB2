@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from datetime import datetime
 from typing import Dict, List, Optional, Union, Literal
 import numpy as np
 from numpy.typing import NDArray
+
 
 @dataclass
 class FAO56Parameters:
@@ -162,7 +162,61 @@ class ActualETCalculator:
             plant_height[growing_mask] = np.clip(height, 0.1, 10.0)
             
         return plant_height
-        
+
+    def calculate_fao56(self, soil_storage: NDArray[np.float32],
+                         soil_storage_max: NDArray[np.float32],
+                         infiltration: NDArray[np.float32],
+                         crop_etc: NDArray[np.float32]) -> None:
+        """Calculate actual ET using FAO-56 method
+
+        This implements the soil water stress coefficient (Ks) approach from
+        FAO-56 Chapter 8. When soil moisture drops below a threshold, actual ET
+        is reduced proportionally.
+        """
+        # Calculate total available water (TAW)
+        taw = soil_storage_max
+
+        # Calculate readily available water (RAW)
+        raw = self.depletion_fraction * taw
+
+        # Calculate current depletion
+        depletion = soil_storage_max - soil_storage
+
+        # Calculate stress coefficient Ks
+        ks = np.ones_like(soil_storage)
+
+        # Apply stress when depletion exceeds RAW
+        stress_mask = depletion > raw
+        ks[stress_mask] = (taw[stress_mask] - depletion[stress_mask]) / \
+                          (taw[stress_mask] - raw[stress_mask])
+
+        # Limit Ks to [0,1]
+        ks = np.clip(ks, 0.0, 1.0)
+
+        # Calculate actual ET
+        self.actual_et = ks * crop_etc
+
+        # Limit actual ET to available water
+        self.actual_et = np.minimum(self.actual_et, soil_storage)
+
+    def calculate_thornthwaite_mather(self, soil_storage: NDArray[np.float32],
+                                       soil_storage_max: NDArray[np.float32],
+                                       infiltration: NDArray[np.float32],
+                                       crop_etc: NDArray[np.float32]) -> None:
+        """Calculate actual ET using Thornthwaite-Mather method
+
+        This implements the original Thornthwaite-Mather approach where
+        actual ET declines linearly with soil moisture.
+        """
+        # Calculate soil moisture ratio
+        moisture_ratio = np.clip(soil_storage / soil_storage_max, 0.0, 1.0)
+
+        # Calculate actual ET as linear function of moisture
+        self.actual_et = moisture_ratio * crop_etc
+
+        # Limit actual ET to available water
+        self.actual_et = np.minimum(self.actual_et, soil_storage)
+
     def calculate_fao56_two_stage(self,
                                  soil_storage: NDArray[np.float64],
                                  soil_storage_max: NDArray[np.float32],
@@ -304,3 +358,7 @@ class ActualETCalculator:
             )
             
         return self.actual_et
+
+
+
+
