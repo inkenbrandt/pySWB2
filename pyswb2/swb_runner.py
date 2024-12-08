@@ -280,16 +280,153 @@ class SWBModelRunner:
             }
         }
 
-    def _initialize_output(self):
-        """Initialize output configuration"""
+    def _initialize_output(self) -> None:
+        """Initialize model output configuration"""
         self.logger.info("Initializing output configuration")
 
-        self.domain.initialize_output(
-            directory=self.config.output.directory,
-            prefix=self.config.output.prefix,
-            variables=self.config.output.variables,
-            compression=self.config.output.compression
-        )
+        # Create output directory if needed
+        self.config.output.directory.mkdir(parents=True, exist_ok=True)
+
+        # Initialize dictionaries to store output information
+        self.output_files = {}
+        self.output_paths = {}
+
+        # Calculate total number of timesteps
+        total_days = (self.config.end_date - self.config.start_date).days + 1
+
+        # Create netCDF files for each variable
+        for var in self.config.output.variables:
+            # Remove any leading underscore from variable name
+            clean_var = var.lstrip('_')
+
+            output_path = (self.config.output.directory /
+                           f"{self.config.output.prefix}{clean_var}.nc")
+            self.output_paths[var] = output_path
+            self._initialize_variable_netcdf(var, output_path, total_days)
+
+    def _initialize_variable_netcdf(self, variable: str, output_path: Path, total_timesteps: int) -> None:
+        """Initialize NetCDF file for a single variable
+
+        Args:
+            variable: Name of the output variable
+            output_path: Path to output NetCDF file
+            total_timesteps: Total number of timesteps in simulation
+        """
+        try:
+            ds = nc.Dataset(output_path, 'w', format='NETCDF4')
+
+            # Create dimensions
+            ds.createDimension('y', self.config.grid.ny)
+            ds.createDimension('x', self.config.grid.nx)
+            ds.createDimension('time', total_timesteps)  # Fixed size dimension
+
+            # Create coordinate variables
+            x = ds.createVariable('x', 'f8', ('x',))
+            y = ds.createVariable('y', 'f8', ('y',))
+            time = ds.createVariable('time', 'f8', ('time',))
+
+            # Set coordinate values
+            x[:] = np.linspace(
+                self.config.grid.x0,
+                self.config.grid.x0 + self.config.grid.nx * self.config.grid.cell_size,
+                self.config.grid.nx
+            )
+            y[:] = np.linspace(
+                self.config.grid.y0,
+                self.config.grid.y0 + self.config.grid.ny * self.config.grid.cell_size,
+                self.config.grid.ny
+            )
+
+            # Initialize time array with all timesteps
+            time[:] = np.arange(total_timesteps)
+
+            # Set time attributes
+            time.units = f'days since {self.config.start_date.strftime("%Y-%m-%d")}'
+            time.calendar = 'standard'
+            time.long_name = 'time'
+
+            # Add global attributes
+            ds.description = f'SWB Model Output - {variable}'
+            ds.history = f'Created {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+            ds.source = 'pySWB2 Model'
+            ds.proj4 = self.config.grid.proj4_string
+            ds.model_version = '2.0'
+            ds.start_date = self.config.start_date.strftime("%Y-%m-%d")
+            ds.end_date = self.config.end_date.strftime("%Y-%m-%d")
+
+            # Get variable metadata
+            metadata = self._get_output_metadata()
+            var_meta = metadata.get(variable.lstrip('_').lower(), {})
+
+            # Create data variable
+            # Remove any leading underscore from variable name in the file
+            clean_var = variable.lstrip('_')
+            v = ds.createVariable(
+                clean_var,
+                'f4',
+                ('time', 'y', 'x'),
+                zlib=self.config.output.compression,
+                fill_value=-9999.0,
+                least_significant_digit=3
+            )
+
+            # Add variable metadata
+            for key, value in var_meta.items():
+                setattr(v, key, value)
+
+            # Initialize variable with fill values
+            v[:] = v._FillValue
+
+            # Store dataset in dictionary
+            self.output_files[variable] = ds
+
+        except Exception as e:
+            self.logger.error(f"Failed to initialize NetCDF file for {variable}: {str(e)}")
+            raise
+
+    def _write_output(self, date: datetime) -> None:
+        """Write output for current timestep
+
+        Args:
+            date: Current simulation date
+        """
+        try:
+            # Calculate time index
+            time_index = (date - self.config.start_date).days
+
+            # Get current state
+            state = self.domain.get_current_state()
+
+            # Write to each variable's NetCDF file
+            for var in self.config.output.variables:
+                if var in state:
+                    try:
+                        ds = self.output_files[var]
+                        if ds is None or not isinstance(ds, nc.Dataset):
+                            # Reopen if needed
+                            ds = nc.Dataset(self.output_paths[var], 'a')
+                            self.output_files[var] = ds
+
+                        # Get clean variable name (without leading underscore)
+                        clean_var = var.lstrip('_')
+
+                        # Reshape and write data
+                        grid_data = state[var].reshape(self.config.grid.ny, self.config.grid.nx)
+                        ds.variables[clean_var][time_index, :, :] = grid_data
+
+                        # Ensure data is written
+                        ds.sync()
+
+                        # Print progress
+                        print(f"Completed timestep {date.strftime('%Y-%m-%d')} for variable: {clean_var}")
+
+                    except Exception as e:
+                        self.logger.error(f"Error writing variable {var} at time {date}: {str(e)}")
+                        raise
+
+        except Exception as e:
+            self.logger.error(f"Failed to write output for {date}: {str(e)}")
+            raise
 
     def run(self):
         """Run model simulation"""
@@ -330,19 +467,6 @@ class SWBModelRunner:
         if self.config.output.write_daily:
             self._write_output(date)
 
-    def _write_output(self, date: datetime):
-        """Write output for current timestep"""
-        output_path = (self.config.output.directory /
-                       f"{self.config.output.prefix}_{date:%Y%m%d}.nc")
-
-        # Get current state
-        state = self.domain.get_current_state()
-
-        # Write variables configured for output
-        with self._get_output_file(output_path) as ds:
-            for var in self.config.output.variables:
-                if var in state:
-                    ds.variables[var][:] = state[var]
 
     def _get_output_metadata(self) -> Dict[str, Dict[str, Any]]:
         """Get metadata for all possible output variables"""
@@ -560,40 +684,20 @@ class SWBModelRunner:
             self.logger.error(f"Error creating output file {path}: {str(e)}")
             raise
 
-    def _write_output(self, date: datetime) -> None:
-        """Write output for current timestep"""
-        try:
-            # Calculate time index
-            time_index = (date - self.config.start_date).days
-
-            # Get output path
-            output_path = (self.config.output.directory /
-                           f"{self.config.output.prefix}_{date:%Y%m%d}.nc")
-
-            # Get current state
-            state = self.domain.get_current_state()
-
-            # Write output
-            with self._get_output_file(output_path) as ds:
-                # Set time value
-                ds.variables['time'][time_index] = time_index
-
-                # Write each configured variable
-                for var in self.config.output.variables:
-                    if var in state:
-                        # Reshape flattened array to grid dimensions
-                        grid_data = state[var].reshape(self.config.grid.ny, self.config.grid.nx)
-                        ds.variables[var][time_index, :, :] = grid_data
-
-        except Exception as e:
-            self.logger.error(f"Failed to write output for {date}: {str(e)}")
-            raise
-
-    def cleanup(self):
+    def cleanup(self) -> None:
         """Clean up model resources"""
         self.logger.info("Cleaning up model resources")
 
         try:
+            # Close NetCDF files
+            for var, ds in self.output_files.items():
+                if ds is not None and isinstance(ds, nc.Dataset):
+                    try:
+                        ds.close()
+                    except Exception as e:
+                        self.logger.warning(f"Error closing NetCDF file for {var}: {str(e)}")
+            self.output_files.clear()
+
             # Clean up domain
             self.domain.cleanup()
 
@@ -608,7 +712,6 @@ class SWBModelRunner:
         except Exception as e:
             self.logger.error(f"Error during cleanup: {str(e)}")
             raise
-
 
 def run_swb_model(config_path: Path, log_dir: Optional[Path] = None) -> None:
     """Convenience function to run SWB model"""
