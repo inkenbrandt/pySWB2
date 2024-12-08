@@ -14,64 +14,78 @@ class RunoffParameters:
     storm_drain_capture_fraction: float = 0.0  # Fraction captured by storm drains
     minimum_runoff: float = 0.01  # Minimum runoff threshold (inches)
 
+
 class RunoffModule:
     """Module for handling runoff calculations in SWB model"""
-    
+
     def __init__(self, domain_size: int, method: Literal["curve_number", "gridded"] = "curve_number"):
         """Initialize runoff module
-        
+
         Args:
             domain_size: Number of cells in model domain
             method: Runoff calculation method
         """
-        if method not in ["curve_number", "gridded"]:
-            raise ValueError("method must be either 'curve_number' or 'gridded'")
-            
+        # Validate domain size
+        if domain_size <= 0:
+            raise ValueError("Domain size must be positive")
+
         self.method = method
         self.domain_size = domain_size
-        
-        # Initialize runoff arrays
+
+        # Initialize arrays with correct size
         self.runoff = np.zeros(domain_size, dtype=np.float32)
         self.runoff_outside = np.zeros(domain_size, dtype=np.float32)
         self.storm_drain_capture = np.zeros(domain_size, dtype=np.float32)
         self.depression_storage = np.zeros(domain_size, dtype=np.float32)
-        
+
         # Initialize curve number arrays
         self.cn_current = np.zeros(domain_size, dtype=np.float32)
         self.cn_dry = np.zeros(domain_size, dtype=np.float32)  # ARC I
         self.cn_normal = np.zeros(domain_size, dtype=np.float32)  # ARC II
         self.cn_wet = np.zeros(domain_size, dtype=np.float32)  # ARC III
-        
+
         # Track antecedent conditions
         self.prev_5day_precip = np.zeros(domain_size, dtype=np.float32)
-        
+
         # Parameters for each landuse type
         self.params: Dict[int, RunoffParameters] = {}
         self.landuse_indices: Optional[NDArray] = None
-        
+
         # Gridded runoff parameters if using gridded method
         self.runoff_zones: Optional[NDArray] = None
         self.runoff_ratios: Optional[NDArray] = None
         self.monthly_ratios: Optional[Dict[int, List[float]]] = None
-        
+
+
     def initialize(self, landuse_indices: NDArray[np.int32],
-                  runoff_zones: Optional[NDArray[np.int32]] = None,
-                  monthly_ratios: Optional[Dict[int, List[float]]] = None) -> None:
-        """Initialize module with landuse data
-        
-        Args:
-            landuse_indices: Array mapping each cell to a landuse type
-            runoff_zones: Optional array mapping cells to runoff zones
-            monthly_ratios: Optional dictionary of monthly adjustment ratios by zone
-        """
-        self.landuse_indices = landuse_indices
-        
+                   runoff_zones: Optional[NDArray[np.int32]] = None,
+                   monthly_ratios: Optional[Dict[int, List[float]]] = None) -> None:
+        """Initialize module with landuse data"""
+        # Ensure landuse indices are flattened and the right size
+        landuse_indices_flat = landuse_indices.ravel()
+        if len(landuse_indices_flat) != self.domain_size:
+            raise ValueError(f"Landuse indices size {len(landuse_indices_flat)} "
+                             f"doesn't match domain size {self.domain_size}")
+
+        self.landuse_indices = landuse_indices_flat
+
+        # Print debug info
+        print(f"Debug - Array sizes:")
+        print(f"Domain size: {self.domain_size}")
+        print(f"Landuse indices shape: {landuse_indices.shape}")
+        print(f"Flattened indices size: {len(landuse_indices_flat)}")
+        print(f"CN normal array size: {len(self.cn_normal)}")
+
         # Initialize curve numbers for each landuse type
         for landuse_id, params in self.params.items():
-            mask = (landuse_indices == landuse_id)
+            mask = (self.landuse_indices == landuse_id)
             if not np.any(mask):
                 continue
-                
+
+            # Verify mask size
+            if len(mask) != self.domain_size:
+                raise ValueError(f"Mask size {len(mask)} doesn't match domain size {self.domain_size}")
+
             # Set initial curve numbers
             self.cn_normal[mask] = params.curve_number
             self.cn_dry[mask] = self._adjust_cn_for_condition(
@@ -80,13 +94,13 @@ class RunoffModule:
             self.cn_wet[mask] = self._adjust_cn_for_condition(
                 params.curve_number, "wet"
             )
-            
+
             # Set initial condition to normal
             self.cn_current[mask] = self.cn_normal[mask]
-            
+
             # Set depression storage
             self.depression_storage[mask] = params.depression_storage
-            
+
         # Initialize gridded parameters if using gridded method
         if self.method == "gridded":
             if runoff_zones is None or monthly_ratios is None:

@@ -1,24 +1,47 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 import numpy as np
 from numpy.typing import NDArray
+from .runoff import RunoffParameters
+from .interception import GashParameters
+
 
 @dataclass
 class CropParameters:
-    """Crop-specific parameters for agricultural calculations"""
+    """Parameters for crop-specific calculations"""
     gdd_base: float = 50.0  # Base temperature for GDD calculation
-    gdd_max: float = 86.0   # Maximum temperature for GDD calculation
+    gdd_max: float = 86.0  # Maximum temperature for GDD calculation
     gdd_reset_date: int = 365  # Day of year to reset GDD
-    growing_season_start: Optional[int] = None  # Starting day of year
-    growing_season_end: Optional[int] = None    # Ending day of year
+    growing_season_start: Optional[str] = None  # Starting day of year
+    growing_season_end: Optional[str] = None  # Ending day of year
     gdd_growing_season_start: Optional[float] = None  # GDD threshold to start growing season
     killing_frost_temp: Optional[float] = None  # Temperature threshold to end growing season
     initial_root_depth: float = 50.0  # Initial rooting depth in mm
-    max_root_depth: float = 1500.0    # Maximum rooting depth in mm
-    root_growth_rate: float = 2.5     # Root growth rate in mm/day
-    crop_coefficient: float = 1.0     # Base crop coefficient
+    max_root_depth: float = 1500.0  # Maximum rooting depth in mm
+    root_growth_rate: float = 2.5  # Root growth rate in mm/day
+    crop_coefficient: float = 1.0  # Base crop coefficient
 
+    def __post_init__(self):
+        """Convert date strings to proper format if needed"""
+        # Handle date string conversions
+        if isinstance(self.growing_season_start, str):
+            if '/' in self.growing_season_start:
+                # Convert MM/DD to day of year
+                month, day = map(int, self.growing_season_start.split('/'))
+                self.growing_season_start = (
+                    datetime(2024, month, day).timetuple().tm_yday
+                )
+
+        if isinstance(self.growing_season_end, str):
+            if '/' in self.growing_season_end:
+                month, day = map(int, self.growing_season_end.split('/'))
+                self.growing_season_end = (
+                    datetime(2024, month, day).timetuple().tm_yday
+                )
+
+
+# In agriculture.py
 class AgricultureModule:
     """Module for handling agricultural calculations in SWB model"""
 
@@ -28,7 +51,10 @@ class AgricultureModule:
         Args:
             domain_size: Number of cells in model domain
         """
-        # Initialize arrays for each cell
+        # Validate domain size
+        if domain_size <= 0:
+            raise ValueError("Domain size must be positive")
+
         self.domain_size = domain_size
         self.gdd = np.zeros(domain_size, dtype=np.float32)
         self.is_growing_season = np.zeros(domain_size, dtype=bool)
@@ -42,7 +68,6 @@ class AgricultureModule:
         self.current_date: Optional[datetime] = None
         self.landuse_indices: Optional[NDArray] = None
 
-    
     def add_crop_parameters(self, crop_id: int, params: CropParameters) -> None:
         """Add or update parameters for a crop type
         
@@ -58,11 +83,16 @@ class AgricultureModule:
         Args:
             landuse_indices: Array mapping each cell to a crop/landuse type
         """
-        self.landuse_indices = landuse_indices
+        # Ensure landuse indices are 1D
+        self.landuse_indices = np.asarray(landuse_indices).ravel()
 
-        # Initialize root depths
+        if len(self.landuse_indices) != self.domain_size:
+            raise ValueError(f"Landuse indices size {len(self.landuse_indices)} "
+                             f"doesn't match domain size {self.domain_size}")
+
+        # Initialize root depths and crop coefficients
         for crop_id, params in self.crop_params.items():
-            mask = (landuse_indices == crop_id)
+            mask = (self.landuse_indices == crop_id)
             self.root_depth[mask] = params.initial_root_depth
             self.crop_coefficient[mask] = params.crop_coefficient
 

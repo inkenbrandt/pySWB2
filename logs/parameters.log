@@ -1,0 +1,314 @@
+2024-12-06 22:30:58,755 - parameters - INFO - Loading configuration from maui_swb2.ctl
+2024-12-06 22:30:58,757 - parameters - INFO - Initializing model grid
+2024-12-06 22:30:58,785 - parameters - INFO - Cleaning up
+2024-12-06 22:35:48,541 - parameters - INFO - Loading configuration from maui_swb2.ctl
+2024-12-06 22:35:48,543 - parameters - INFO - Initializing model grid
+2024-12-06 22:35:48,577 - parameters - INFO - Cleaning up
+2024-12-06 22:47:06,709 - parameters - INFO - Loading configuration from maui_swb2.ctl
+2024-12-06 22:47:06,709 - parameters - INFO - Loading configuration from maui_swb2.ctl
+2024-12-06 22:47:06,710 - parameters - INFO - Initializing model grid
+2024-12-06 22:47:06,710 - parameters - INFO - Initializing model grid
+2024-12-06 22:47:06,743 - parameters - INFO - Loading input grids
+2024-12-06 22:47:06,743 - parameters - INFO - Loading input grids
+2024-12-06 22:47:06,746 - parameters - INFO - Cleaning up
+2024-12-06 22:47:06,746 - parameters - INFO - Cleaning up
+2024-12-06 22:47:06,746 - parameters - INFO - Cleaning up model domain resources
+2024-12-06 22:47:06,746 - parameters - INFO - Cleaning up model domain resources
+2024-12-06 22:50:26,681 - parameters - INFO - Loading configuration from maui_swb2.ctl
+2024-12-06 22:50:26,681 - parameters - INFO - Loading configuration from maui_swb2.ctl
+2024-12-06 22:50:26,683 - parameters - INFO - Initializing model grid
+2024-12-06 22:50:26,683 - parameters - INFO - Initializing model grid
+2024-12-06 22:50:26,708 - parameters - INFO - Loading input grids
+2024-12-06 22:50:26,708 - parameters - INFO - Loading input grids
+2024-12-06 22:50:27,377 - parameters - INFO - Initializing model modules
+2024-12-06 22:50:27,377 - parameters - INFO - Initializing model modules
+2024-12-06 22:50:27,379 - parameters - INFO - Cleaning up
+2024-12-06 22:50:27,379 - parameters - INFO - Cleaning up
+2024-12-06 22:50:27,380 - parameters - INFO - Cleaning up model domain resources
+2024-12-06 22:50:27,380 - parameters - INFO - Cleaning up model domain resources
+2024-12-07 09:42:41,216 - parameters - INFO - Initializing model modules
+2024-12-07 09:44:50,732 - parameters - INFO - Initializing model modules
+2024-12-07 09:45:42,562 - parameters - INFO - Initializing model modules
+2024-12-07 14:21:51,949 - parameters - INFO - Loading configuration from maui_swb2.ctl
+2024-12-07 14:21:51,949 - parameters - INFO - Loading configuration from maui_swb2.ctl
+2024-12-07 14:21:51,951 - parameters - INFO - Initializing model grid
+2024-12-07 14:21:51,951 - parameters - INFO - Initializing model grid
+2024-12-07 14:21:51,952 - parameters - INFO - Initializing model grid
+2024-12-07 14:21:51,952 - parameters - INFO - Initializing model grid
+2024-12-07 14:21:51,965 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 14:21:51,965 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 14:21:51,966 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 14:21:51,966 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 14:21:51,992 - parameters - INFO - Loading input grids
+2024-12-07 14:21:51,992 - parameters - INFO - Loading input grids
+2024-12-07 14:21:52,609 - parameters - INFO - Initializing model modules
+2024-12-07 14:21:52,609 - parameters - INFO - Initializing model modules
+2024-12-07 14:21:52,610 - parameters - INFO - Initializing model parameters
+2024-12-07 14:21:52,610 - parameters - INFO - Initializing model parameters
+2024-12-07 14:21:52,611 - parameters - ERROR - Parameter initialization failed: pyswb2.runoff.RunoffParameters() argument after ** must be a mapping, not RunoffParameters
+2024-12-07 14:21:52,611 - parameters - ERROR - Parameter initialization failed: pyswb2.runoff.RunoffParameters() argument after ** must be a mapping, not RunoffParameters
+2024-12-07 14:21:52,613 - parameters - INFO - Cleaning up
+2024-12-07 14:21:52,613 - parameters - INFO - Cleaning up
+2024-12-07 14:21:52,614 - parameters - INFO - Cleaning up model resources
+2024-12-07 14:21:52,614 - parameters - INFO - Cleaning up model resources
+2024-12-07 14:31:36,242 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 14:34:48,496 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 14:38:15,055 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 14:40:33,053 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 14:40:33,056 - parameters - INFO - Initializing model grid
+2024-12-07 14:40:33,056 - parameters - INFO - Initializing model grid
+2024-12-07 14:40:33,068 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 14:40:33,068 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 14:40:33,069 - parameters - INFO - Grid initialized: 316x210
+2024-12-07 14:40:33,069 - parameters - INFO - Grid initialized: 316x210
+2024-12-07 14:40:33,070 - parameters - ERROR - Initialization failed: 'SWBModelRunner' object has no attribute '_process_landuse_parameters'
+2024-12-07 14:40:33,070 - parameters - ERROR - Initialization failed: 'SWBModelRunner' object has no attribute '_process_landuse_parameters'
+2024-12-07 14:40:33,072 - parameters - INFO - Cleaning up model resources
+2024-12-07 14:40:33,072 - parameters - INFO - Cleaning up model resources
+2024-12-07 14:40:33,074 - parameters - INFO - Cleaning up model resources
+2024-12-07 14:40:33,074 - parameters - INFO - Cleaning up model resources
+2024-12-07 14:43:48,517 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 14:43:48,519 - parameters - INFO - Initializing model grid
+2024-12-07 14:43:48,519 - parameters - INFO - Initializing model grid
+2024-12-07 14:43:48,531 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 14:43:48,531 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 14:43:48,532 - parameters - INFO - Grid initialized: 316x210
+2024-12-07 14:43:48,532 - parameters - INFO - Grid initialized: 316x210
+2024-12-07 14:43:48,532 - parameters - INFO - Processing landuse parameters
+2024-12-07 14:43:48,532 - parameters - INFO - Processing landuse parameters
+2024-12-07 14:43:48,535 - parameters - INFO - Processing soil parameters
+2024-12-07 14:43:48,535 - parameters - INFO - Processing soil parameters
+2024-12-07 14:43:48,536 - parameters - INFO - Initializing model parameters
+2024-12-07 14:43:48,536 - parameters - INFO - Initializing model parameters
+2024-12-07 14:43:48,537 - parameters - INFO - Parameter initialization complete
+2024-12-07 14:43:48,537 - parameters - INFO - Parameter initialization complete
+2024-12-07 14:43:48,538 - parameters - ERROR - Initialization failed: 'SWBModelRunner' object has no attribute 'landuse_indices'
+2024-12-07 14:43:48,538 - parameters - ERROR - Initialization failed: 'SWBModelRunner' object has no attribute 'landuse_indices'
+2024-12-07 14:43:48,538 - parameters - INFO - Cleaning up model resources
+2024-12-07 14:43:48,538 - parameters - INFO - Cleaning up model resources
+2024-12-07 14:43:48,539 - parameters - INFO - Cleaning up model resources
+2024-12-07 14:43:48,539 - parameters - INFO - Cleaning up model resources
+2024-12-07 17:15:24,592 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 17:33:16,559 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 17:33:58,436 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 17:48:13,690 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 17:48:13,692 - parameters - INFO - Loading input data
+2024-12-07 17:48:13,692 - parameters - INFO - Loading input data
+2024-12-07 17:48:13,887 - parameters - ERROR - Failed to load input data: 'InputConfig' object has no attribute 'hydrologic_soils_group'
+2024-12-07 17:48:13,887 - parameters - ERROR - Failed to load input data: 'InputConfig' object has no attribute 'hydrologic_soils_group'
+2024-12-07 17:48:13,888 - parameters - ERROR - Initialization failed: 'InputConfig' object has no attribute 'hydrologic_soils_group'
+2024-12-07 17:48:13,888 - parameters - ERROR - Initialization failed: 'InputConfig' object has no attribute 'hydrologic_soils_group'
+2024-12-07 17:50:25,452 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 17:57:32,597 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 17:57:32,600 - parameters - INFO - Loading input data
+2024-12-07 17:57:32,600 - parameters - INFO - Loading input data
+2024-12-07 17:57:32,810 - parameters - ERROR - Failed to load input data: 'InputConfig' object has no attribute 'hydrologic_soils_group'
+2024-12-07 17:57:32,810 - parameters - ERROR - Failed to load input data: 'InputConfig' object has no attribute 'hydrologic_soils_group'
+2024-12-07 17:57:32,811 - parameters - ERROR - Initialization failed: 'InputConfig' object has no attribute 'hydrologic_soils_group'
+2024-12-07 17:57:32,811 - parameters - ERROR - Initialization failed: 'InputConfig' object has no attribute 'hydrologic_soils_group'
+2024-12-07 18:13:41,091 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 18:20:00,398 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 18:28:10,722 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 18:28:10,725 - parameters - INFO - Loading input data
+2024-12-07 18:28:10,725 - parameters - INFO - Loading input data
+2024-12-07 18:28:11,185 - parameters - INFO - Initializing model grid
+2024-12-07 18:28:11,185 - parameters - INFO - Initializing model grid
+2024-12-07 18:28:11,186 - parameters - INFO - Initializing model grid
+2024-12-07 18:28:11,186 - parameters - INFO - Initializing model grid
+2024-12-07 18:28:11,202 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 18:28:11,202 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 18:28:11,203 - parameters - INFO - Processing landuse parameters
+2024-12-07 18:28:11,203 - parameters - INFO - Processing landuse parameters
+2024-12-07 18:28:11,207 - parameters - INFO - Processing soil parameters
+2024-12-07 18:28:11,207 - parameters - INFO - Processing soil parameters
+2024-12-07 18:28:11,208 - parameters - INFO - Initializing model parameters
+2024-12-07 18:28:11,208 - parameters - INFO - Initializing model parameters
+2024-12-07 18:28:11,211 - parameters - INFO - Parameter initialization complete
+2024-12-07 18:28:11,211 - parameters - INFO - Parameter initialization complete
+2024-12-07 18:28:11,213 - parameters - INFO - Initializing model modules
+2024-12-07 18:28:11,213 - parameters - INFO - Initializing model modules
+2024-12-07 18:28:11,224 - parameters - ERROR - Module initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 18:28:11,224 - parameters - ERROR - Module initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 18:28:11,225 - parameters - ERROR - Initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 18:28:11,225 - parameters - ERROR - Initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 18:29:06,609 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 18:29:06,612 - parameters - INFO - Loading input data
+2024-12-07 18:29:06,612 - parameters - INFO - Loading input data
+2024-12-07 18:29:07,108 - parameters - INFO - Initializing model grid
+2024-12-07 18:29:07,108 - parameters - INFO - Initializing model grid
+2024-12-07 18:29:07,109 - parameters - INFO - Initializing model grid
+2024-12-07 18:29:07,109 - parameters - INFO - Initializing model grid
+2024-12-07 18:29:07,123 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 18:29:07,123 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 18:29:07,125 - parameters - INFO - Processing landuse parameters
+2024-12-07 18:29:07,125 - parameters - INFO - Processing landuse parameters
+2024-12-07 18:29:07,128 - parameters - INFO - Processing soil parameters
+2024-12-07 18:29:07,128 - parameters - INFO - Processing soil parameters
+2024-12-07 18:29:07,129 - parameters - INFO - Initializing model parameters
+2024-12-07 18:29:07,129 - parameters - INFO - Initializing model parameters
+2024-12-07 18:29:07,130 - parameters - INFO - Parameter initialization complete
+2024-12-07 18:29:07,130 - parameters - INFO - Parameter initialization complete
+2024-12-07 18:29:07,131 - parameters - INFO - Initializing model modules
+2024-12-07 18:29:07,131 - parameters - INFO - Initializing model modules
+2024-12-07 18:29:07,140 - parameters - ERROR - Module initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 18:29:07,140 - parameters - ERROR - Module initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 18:29:07,141 - parameters - ERROR - Initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 18:29:07,141 - parameters - ERROR - Initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 18:46:57,369 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 18:46:57,373 - parameters - INFO - Loading input data
+2024-12-07 18:46:57,373 - parameters - INFO - Loading input data
+2024-12-07 18:46:57,802 - parameters - INFO - Initializing model grid
+2024-12-07 18:46:57,802 - parameters - INFO - Initializing model grid
+2024-12-07 18:46:57,803 - parameters - INFO - Initializing model grid
+2024-12-07 18:46:57,803 - parameters - INFO - Initializing model grid
+2024-12-07 18:46:57,814 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 18:46:57,814 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 18:46:57,815 - parameters - INFO - Processing landuse parameters
+2024-12-07 18:46:57,815 - parameters - INFO - Processing landuse parameters
+2024-12-07 18:46:57,818 - parameters - INFO - Processing soil parameters
+2024-12-07 18:46:57,818 - parameters - INFO - Processing soil parameters
+2024-12-07 18:46:57,819 - parameters - INFO - Initializing model parameters
+2024-12-07 18:46:57,819 - parameters - INFO - Initializing model parameters
+2024-12-07 18:46:57,821 - parameters - INFO - Parameter initialization complete
+2024-12-07 18:46:57,821 - parameters - INFO - Parameter initialization complete
+2024-12-07 18:46:57,823 - parameters - INFO - Initializing model modules
+2024-12-07 18:46:57,823 - parameters - INFO - Initializing model modules
+2024-12-07 18:46:57,830 - parameters - ERROR - Module initialization failed: boolean index did not match indexed array along axis 0; size of axis is 66360 but size of corresponding boolean axis is 2000700
+2024-12-07 18:46:57,830 - parameters - ERROR - Module initialization failed: boolean index did not match indexed array along axis 0; size of axis is 66360 but size of corresponding boolean axis is 2000700
+2024-12-07 18:46:57,831 - parameters - ERROR - Initialization failed: boolean index did not match indexed array along axis 0; size of axis is 66360 but size of corresponding boolean axis is 2000700
+2024-12-07 18:46:57,831 - parameters - ERROR - Initialization failed: boolean index did not match indexed array along axis 0; size of axis is 66360 but size of corresponding boolean axis is 2000700
+2024-12-07 18:54:35,151 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 18:54:35,153 - parameters - INFO - Loading input data
+2024-12-07 18:54:35,153 - parameters - INFO - Loading input data
+2024-12-07 18:54:35,515 - parameters - INFO - Initializing model grid
+2024-12-07 18:54:35,515 - parameters - INFO - Initializing model grid
+2024-12-07 18:54:35,517 - parameters - INFO - Initializing model grid
+2024-12-07 18:54:35,517 - parameters - INFO - Initializing model grid
+2024-12-07 18:54:35,530 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 18:54:35,530 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 18:54:35,532 - parameters - INFO - Processing landuse parameters
+2024-12-07 18:54:35,532 - parameters - INFO - Processing landuse parameters
+2024-12-07 18:54:35,534 - parameters - INFO - Processing soil parameters
+2024-12-07 18:54:35,534 - parameters - INFO - Processing soil parameters
+2024-12-07 18:54:35,536 - parameters - INFO - Initializing model parameters
+2024-12-07 18:54:35,536 - parameters - INFO - Initializing model parameters
+2024-12-07 18:54:35,538 - parameters - INFO - Parameter initialization complete
+2024-12-07 18:54:35,538 - parameters - INFO - Parameter initialization complete
+2024-12-07 18:54:35,540 - parameters - INFO - Initializing model modules
+2024-12-07 18:54:35,540 - parameters - INFO - Initializing model modules
+2024-12-07 18:54:35,542 - parameters - ERROR - Module initialization failed: Landuse indices size 2000700 doesn't match domain size 66360
+2024-12-07 18:54:35,542 - parameters - ERROR - Module initialization failed: Landuse indices size 2000700 doesn't match domain size 66360
+2024-12-07 18:54:35,542 - parameters - ERROR - Initialization failed: Landuse indices size 2000700 doesn't match domain size 66360
+2024-12-07 18:54:35,542 - parameters - ERROR - Initialization failed: Landuse indices size 2000700 doesn't match domain size 66360
+2024-12-07 19:13:23,854 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 19:13:23,857 - parameters - INFO - Loading input data
+2024-12-07 19:13:23,857 - parameters - INFO - Loading input data
+2024-12-07 19:13:24,287 - parameters - INFO - Initializing model grid
+2024-12-07 19:13:24,287 - parameters - INFO - Initializing model grid
+2024-12-07 19:13:24,288 - parameters - INFO - Initializing model grid
+2024-12-07 19:13:24,288 - parameters - INFO - Initializing model grid
+2024-12-07 19:13:24,302 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 19:13:24,302 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 19:13:24,303 - parameters - INFO - Processing landuse parameters
+2024-12-07 19:13:24,303 - parameters - INFO - Processing landuse parameters
+2024-12-07 19:13:24,306 - parameters - INFO - Processing soil parameters
+2024-12-07 19:13:24,306 - parameters - INFO - Processing soil parameters
+2024-12-07 19:13:24,306 - parameters - INFO - Initializing model parameters
+2024-12-07 19:13:24,306 - parameters - INFO - Initializing model parameters
+2024-12-07 19:13:24,308 - parameters - INFO - Parameter initialization complete
+2024-12-07 19:13:24,308 - parameters - INFO - Parameter initialization complete
+2024-12-07 19:13:24,309 - parameters - INFO - Initializing model modules
+2024-12-07 19:13:24,309 - parameters - INFO - Initializing model modules
+2024-12-07 19:13:24,310 - parameters - ERROR - Module initialization failed: Landuse indices size 2000700 doesn't match domain size 66360
+2024-12-07 19:13:24,310 - parameters - ERROR - Module initialization failed: Landuse indices size 2000700 doesn't match domain size 66360
+2024-12-07 19:13:24,311 - parameters - ERROR - Initialization failed: Landuse indices size 2000700 doesn't match domain size 66360
+2024-12-07 19:13:24,311 - parameters - ERROR - Initialization failed: Landuse indices size 2000700 doesn't match domain size 66360
+2024-12-07 19:51:42,757 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 19:51:42,760 - parameters - INFO - Loading input data
+2024-12-07 19:51:42,760 - parameters - INFO - Loading input data
+2024-12-07 19:51:42,761 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 19:51:42,761 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 19:51:42,984 - parameters - ERROR - Failed to load and align grid input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc: could not broadcast input array from shape (146,206) into shape (210,316)
+2024-12-07 19:51:42,984 - parameters - ERROR - Failed to load and align grid input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc: could not broadcast input array from shape (146,206) into shape (210,316)
+2024-12-07 19:51:42,985 - parameters - ERROR - Failed to load input data: could not broadcast input array from shape (146,206) into shape (210,316)
+2024-12-07 19:51:42,985 - parameters - ERROR - Failed to load input data: could not broadcast input array from shape (146,206) into shape (210,316)
+2024-12-07 19:51:42,986 - parameters - ERROR - Initialization failed: could not broadcast input array from shape (146,206) into shape (210,316)
+2024-12-07 19:51:42,986 - parameters - ERROR - Initialization failed: could not broadcast input array from shape (146,206) into shape (210,316)
+2024-12-07 19:58:07,554 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 19:58:07,557 - parameters - INFO - Loading input data
+2024-12-07 19:58:07,557 - parameters - INFO - Loading input data
+2024-12-07 19:58:07,559 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 19:58:07,559 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 19:58:07,816 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 19:58:07,816 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 19:58:08,070 - parameters - INFO - Initializing model grid
+2024-12-07 19:58:08,070 - parameters - INFO - Initializing model grid
+2024-12-07 19:58:08,071 - parameters - INFO - Initializing model grid
+2024-12-07 19:58:08,071 - parameters - INFO - Initializing model grid
+2024-12-07 19:58:08,083 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 19:58:08,083 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 19:58:08,084 - parameters - INFO - Processing landuse parameters
+2024-12-07 19:58:08,084 - parameters - INFO - Processing landuse parameters
+2024-12-07 19:58:08,087 - parameters - INFO - Processing soil parameters
+2024-12-07 19:58:08,087 - parameters - INFO - Processing soil parameters
+2024-12-07 19:58:08,088 - parameters - INFO - Initializing model parameters
+2024-12-07 19:58:08,088 - parameters - INFO - Initializing model parameters
+2024-12-07 19:58:08,090 - parameters - INFO - Parameter initialization complete
+2024-12-07 19:58:08,090 - parameters - INFO - Parameter initialization complete
+2024-12-07 19:58:08,092 - parameters - INFO - Initializing model modules
+2024-12-07 19:58:08,092 - parameters - INFO - Initializing model modules
+2024-12-07 19:58:08,097 - parameters - ERROR - Module initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 19:58:08,097 - parameters - ERROR - Module initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 19:58:08,098 - parameters - ERROR - Initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 19:58:08,098 - parameters - ERROR - Initialization failed: too many indices for array: array is 1-dimensional, but 2 were indexed
+2024-12-07 20:04:38,876 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 20:04:38,880 - parameters - INFO - Loading input data
+2024-12-07 20:04:38,880 - parameters - INFO - Loading input data
+2024-12-07 20:04:38,881 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 20:04:38,881 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 20:04:39,162 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 20:04:39,162 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 20:04:39,410 - parameters - INFO - Initializing model grid
+2024-12-07 20:04:39,410 - parameters - INFO - Initializing model grid
+2024-12-07 20:04:39,411 - parameters - INFO - Initializing model grid
+2024-12-07 20:04:39,411 - parameters - INFO - Initializing model grid
+2024-12-07 20:04:39,423 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 20:04:39,423 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 20:04:39,425 - parameters - INFO - Processing landuse parameters
+2024-12-07 20:04:39,425 - parameters - INFO - Processing landuse parameters
+2024-12-07 20:04:39,427 - parameters - INFO - Processing soil parameters
+2024-12-07 20:04:39,427 - parameters - INFO - Processing soil parameters
+2024-12-07 20:04:39,429 - parameters - INFO - Initializing model parameters
+2024-12-07 20:04:39,429 - parameters - INFO - Initializing model parameters
+2024-12-07 20:04:39,430 - parameters - INFO - Parameter initialization complete
+2024-12-07 20:04:39,430 - parameters - INFO - Parameter initialization complete
+2024-12-07 20:04:39,432 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 20:04:39,432 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 20:04:39,433 - parameters - INFO - Landuse indices: 66360
+2024-12-07 20:04:39,433 - parameters - INFO - Landuse indices: 66360
+2024-12-07 20:04:39,435 - parameters - INFO - Soil indices: 66360
+2024-12-07 20:04:39,435 - parameters - INFO - Soil indices: 66360
+2024-12-07 20:04:39,436 - parameters - INFO - Elevation: 66360
+2024-12-07 20:04:39,436 - parameters - INFO - Elevation: 66360
+2024-12-07 20:04:39,437 - parameters - INFO - Latitude: 66360
+2024-12-07 20:04:39,437 - parameters - INFO - Latitude: 66360
+2024-12-07 20:04:39,438 - parameters - INFO - Initializing model modules
+2024-12-07 20:04:39,438 - parameters - INFO - Initializing model modules
+2024-12-07 20:04:39,490 - parameters - INFO - Module initialization complete
+2024-12-07 20:04:39,490 - parameters - INFO - Module initialization complete
+2024-12-07 20:04:39,491 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 20:04:39,491 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 20:04:39,492 - parameters - INFO - Initializing output configuration
+2024-12-07 20:04:39,492 - parameters - INFO - Initializing output configuration
+2024-12-07 20:04:39,494 - parameters - INFO - Output configuration initialized
+2024-12-07 20:04:39,494 - parameters - INFO - Output configuration initialized
+2024-12-07 20:04:39,495 - parameters - INFO - Model initialization complete
+2024-12-07 20:04:39,495 - parameters - INFO - Model initialization complete
+2024-12-07 20:04:39,497 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 20:04:39,497 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 20:04:39,502 - parameters - ERROR - Simulation failed: 'NoneType' object has no attribute 'shape'
+2024-12-07 20:04:39,502 - parameters - ERROR - Simulation failed: 'NoneType' object has no attribute 'shape'
+2024-12-07 20:04:39,503 - parameters - INFO - Cleaning up model resources
+2024-12-07 20:04:39,503 - parameters - INFO - Cleaning up model resources
+2024-12-07 20:04:39,504 - parameters - INFO - Cleaning up model resources
+2024-12-07 20:04:39,504 - parameters - INFO - Cleaning up model resources
