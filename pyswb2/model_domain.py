@@ -8,7 +8,7 @@ import logging
 
 from .runoff import RunoffModule, RunoffParameters
 from .agriculture import AgricultureModule, CropParameters
-from .actual_et import ActualETCalculator
+from .actual_et import ActualETCalculator, FAO56Parameters
 from .interception import InterceptionModule, GashParameters
 from .infiltration import InfiltrationModule, InfiltrationParameters
 from .soil import SoilModule, SoilParameters
@@ -18,10 +18,7 @@ from .logging_config import ParameterLogger
 
 
 class ModelDomain:
-    """
-    Core model domain class handling state, calculations, and module coordination.
-    Implements optimized integration pattern with proper initialization and state management.
-    """
+    """Core model domain class handling state, calculations, and module coordination"""
 
     def __init__(self, log_dir: Optional[Path] = None):
         """Initialize model domain with logging"""
@@ -40,11 +37,16 @@ class ModelDomain:
         self.x_ll: float = 0.0
         self.y_ll: float = 0.0
         self.proj4_string: str = ""
+        self.domain_size: int = 0
+        self.active: Optional[NDArray[np.bool_]] = None
 
         # Time tracking
         self.current_date: Optional[datetime] = None
         self.start_date: Optional[datetime] = None
         self.end_date: Optional[datetime] = None
+
+        # Initialize empty arrays
+        self._initialize_arrays()
 
         # Module instances (initialized later)
         self.runoff_module: Optional[RunoffModule] = None
@@ -61,8 +63,92 @@ class ModelDomain:
         self.dynamic_rooting: bool = False
         self.use_crop_coefficients: bool = False
 
-        # Initialize empty arrays (sized during grid initialization)
-        self._initialize_arrays()
+        # Routing variables
+        self.flow_direction: Optional[NDArray[np.int32]] = None
+        self.flow_sequence: Optional[NDArray[np.int32]] = None
+        self.routing_fraction: Optional[NDArray[np.float32]] = None
+
+        # Module indices
+        self.landuse_indices: Optional[NDArray[np.int32]] = None
+        self.soil_indices: Optional[NDArray[np.int32]] = None
+
+    def _initialize_arrays(self) -> None:
+        """Initialize empty arrays"""
+        # Storage variables
+        self.surface_storage = None
+        self.snow_storage = None
+        self.interception_storage = None
+        self.soil_storage = None
+        self.soil_storage_max = None
+
+        # Precipitation and moisture variables
+        self.gross_precip = None
+        self.rainfall = None
+        self.snowfall = None
+        self.net_rainfall = None
+        self.net_snowfall = None
+        self.fog = None
+
+        # Water flux variables
+        self.runoff = None
+        self.runon = None
+        self.infiltration = None
+        self.net_infiltration = None
+        self.potential_snowmelt = None
+        self.snowmelt = None
+        self.direct_net_infiltration = None
+        self.direct_soil_moisture = None
+
+        # ET variables
+        self.reference_et0 = None
+        self.actual_et = None
+        self.actual_et_interception = None
+        self.crop_etc = None
+
+        # Interception variables
+        self.interception = None
+        self.interception_storage = None
+        self.interception_storage_max = None
+
+        # Temperature variables
+        self.tmin = None
+        self.tmax = None
+        self.tmean = None
+
+        # Vegetation variables
+        self.crop_coefficient = None
+        self.rooting_depth = None
+        self.wilting_point = None
+        self.field_capacity = None
+        self.available_water_content = None
+
+    def _initialize_domain_arrays(self) -> None:
+        """Initialize domain arrays to proper size"""
+        n_active = np.count_nonzero(self.active)
+
+        # Create all arrays with proper size
+        array_names = [
+            'surface_storage', 'snow_storage', 'interception_storage',
+            'soil_storage', 'soil_storage_max', 'gross_precip',
+            'rainfall', 'snowfall', 'net_rainfall', 'net_snowfall',
+            'fog', 'runoff', 'runon', 'infiltration', 'net_infiltration',
+            'potential_snowmelt', 'snowmelt', 'direct_net_infiltration',
+            'direct_soil_moisture', 'reference_et0', 'actual_et',
+            'actual_et_interception', 'crop_etc', 'interception',
+            'interception_storage', 'interception_storage_max',
+            'tmin', 'tmax', 'tmean', 'crop_coefficient', 'rooting_depth',
+            'wilting_point', 'field_capacity', 'available_water_content'
+        ]
+
+        for name in array_names:
+            if name == 'crop_coefficient':
+                # Initialize crop coefficient to 1.0
+                setattr(self, name, np.ones(n_active, dtype=np.float32))
+            else:
+                # Initialize other arrays to 0.0
+                setattr(self, name, np.zeros(n_active, dtype=np.float32))
+
+        self.logger.debug(f"Initialized {len(array_names)} domain arrays with size {n_active}")
 
     def initialize_grid(self, nx: int, ny: int, x_ll: float, y_ll: float,
                         cell_size: float, proj4: str = "") -> None:
@@ -83,49 +169,81 @@ class ModelDomain:
         self.y_ll = y_ll
         self.proj4_string = proj4
 
-        # Initialize domain size and arrays
+        # Initialize domain size and active cells mask
         self.domain_size = nx * ny
         self.active = np.ones((ny, nx), dtype=bool)
 
-        # Size arrays
+        # Initialize arrays to proper size
         self._initialize_domain_arrays()
-
-        # Initialize modules with domain size
-        self._initialize_modules()
 
         self.is_initialized = True
         self.logger.info(f"Grid initialized: {nx}x{ny} cells")
 
     def initialize_parameters(self, landuse_params: Dict[int, Dict],
                               soil_params: Dict[int, Dict]) -> None:
-        """Initialize parameters for all modules with validation"""
+        """Initialize parameters for all modules"""
         if not self.is_initialized:
             raise RuntimeError("Grid must be initialized before parameters")
 
         self.logger.info("Initializing model parameters")
 
         try:
-            # Validate parameters
-            self._validate_landuse_parameters(landuse_params)
-            self._validate_soil_parameters(soil_params)
-
             # Initialize module parameters
+            self._initialize_modules()
+
+            # Add a default entry to landuse_params if not present
+            if 0 not in landuse_params:
+                landuse_params[0] = {
+                    'runoff': {
+                        'curve_number': 70.0,
+                        'initial_abstraction_ratio': 0.2,
+                        'depression_storage': 0.1,
+                        'impervious_fraction': 0.0
+                    },
+                    'crop': {
+                        'gdd_base': 50.0,
+                        'gdd_max': 86.0,
+                        'growing_season_start': None,
+                        'growing_season_end': None,
+                        'initial_root_depth': 50.0,
+                        'max_root_depth': 1500.0,
+                        'crop_coefficient': 1.0
+                    },
+                    'interception': {
+                        'canopy_storage_capacity': 0.1,
+                        'trunk_storage_capacity': 0.0,
+                        'stemflow_fraction': 0.0,
+                        'interception_storage_max_growing': 0.1,
+                        'interception_storage_max_nongrowing': 0.1
+                    }
+                }
+
+            # Initialize landuse parameters
             for landuse_id, params in landuse_params.items():
-                self.runoff_module.add_parameters(
-                    landuse_id, RunoffParameters(**params['runoff']))
+                if 'runoff' in params:
+                    self.runoff_module.add_parameters(
+                        landuse_id, RunoffParameters(**params['runoff']))
+                if 'crop' in params:
+                    self.agriculture_module.add_crop_parameters(
+                        landuse_id, CropParameters(**params['crop']))
+                if 'interception' in params:
+                    self.interception_module.add_gash_parameters(
+                        landuse_id, GashParameters(**params['interception']))
 
-                self.agriculture_module.add_crop_parameters(
-                    landuse_id, CropParameters(**params['crop']))
-
-                self.interception_module.add_gash_parameters(
-                    landuse_id, GashParameters(**params['interception']))
-
-            for soil_id, params in soil_params.items():
-                self.infiltration_module.add_soil_parameters(
-                    soil_id, InfiltrationParameters(**params['infiltration']))
-
-                self.soil_module.add_soil_parameters(
-                    soil_id, SoilParameters(**params['soil']))
+                # Add ET parameters using crop parameters
+                if 'crop' in params:
+                    et_params = FAO56Parameters(
+                        depletion_fraction=0.5,  # Default value
+                        rew=0.1,  # Default REW
+                        tew=0.4,  # Default TEW
+                        mean_plant_height=params['crop'].get('max_root_depth', 0.0) / 12.0,  # Convert to feet
+                        kcb_min=0.15,  # Default minimum
+                        kcb_mid=params['crop'].get('crop_coefficient', 1.0),
+                        kcb_end=0.15,  # Default end value
+                        initial_root_depth=params['crop'].get('initial_root_depth', 50.0),
+                        max_root_depth=params['crop'].get('max_root_depth', 1500.0)
+                    )
+                    self.actual_et_calculator.add_parameters(landuse_id, et_params)
 
             self.parameters_initialized = True
             self.logger.info("Parameter initialization complete")
@@ -146,11 +264,22 @@ class ModelDomain:
         self.logger.info("Initializing model modules")
 
         try:
+            # Store indices
+            self.landuse_indices = landuse_indices
+            self.soil_indices = soil_indices
+
             # Initialize each module
             self.runoff_module.initialize(landuse_indices)
             self.agriculture_module.initialize(landuse_indices)
             self.soil_module.initialize(soil_indices, self.soil_storage_max)
             self.infiltration_module.initialize(soil_indices, self.soil_storage_max)
+
+            # Initialize interception module with landuse data and default canopy cover
+            self.interception_module.initialize(
+                landuse_indices=landuse_indices,
+                canopy_cover=np.ones_like(landuse_indices, dtype=np.float32),  # Default full cover
+                evap_to_rain_ratio=np.ones_like(landuse_indices, dtype=np.float32)  # Default 1:1 ratio
+            )
 
             # Initialize weather module
             self.weather_module.initialize(
@@ -162,11 +291,32 @@ class ModelDomain:
                 latitude=latitude
             )
 
+            # Initialize potential ET calculator with latitude
+            self.potential_et_calculator.latitude = latitude
+
+            # Initialize actual ET calculator with relevant data
+            self.actual_et_calculator.initialize(
+                landuse_indices=landuse_indices,
+                soil_indices=soil_indices,
+                elevation=elevation
+            )
+
             self.logger.info("Module initialization complete")
 
         except Exception as e:
             self.logger.error(f"Module initialization failed: {str(e)}")
             raise
+
+    def _initialize_modules(self) -> None:
+        """Initialize all model modules"""
+        self.runoff_module = RunoffModule(self.domain_size)
+        self.agriculture_module = AgricultureModule(self.domain_size)
+        self.actual_et_calculator = ActualETCalculator(self.domain_size)
+        self.interception_module = InterceptionModule(self.domain_size)
+        self.infiltration_module = InfiltrationModule(self.domain_size)
+        self.soil_module = SoilModule(self.domain_size)
+        self.weather_module = WeatherModule(self.domain_size, (self.number_of_rows, self.number_of_columns))
+        self.potential_et_calculator = PotentialETCalculator(self.domain_size)
 
     def initialize_simulation_period(self, start_date: datetime, end_date: datetime) -> None:
         """Initialize simulation start and end dates"""
@@ -179,19 +329,32 @@ class ModelDomain:
 
         self.logger.info(f"Simulation period: {start_date} to {end_date}")
 
+    def initialize_output(self, directory: Path, prefix: str,
+                          variables: List[str], compression: bool = True) -> None:
+        """Initialize output configuration"""
+        if not self.is_initialized:
+            raise RuntimeError("Domain must be initialized before output")
+
+        self.output_dir = directory
+        self.output_prefix = prefix
+        self.output_variables = variables
+        self.output_compression = compression
+
+        # Create output directory
+        directory.mkdir(parents=True, exist_ok=True)
+
+        self.output_initialized = True
+        self.logger.info("Output configuration initialized")
+
     def update_date(self, date: datetime) -> None:
-        """Update current simulation date and related state"""
+        """Update current simulation date"""
         self.current_date = date
 
-        # Update date in modules that need it
         if self.agriculture_module is not None:
             self.agriculture_module.current_date = date
 
-        # Update any time-dependent parameters
-        self._update_time_dependent_parameters()
-
     def get_weather_data(self, date: datetime) -> None:
-        """Update weather data for given date"""
+        """Update weather data for current date"""
         self.weather_module.process_timestep(
             date=date,
             base_tmin=self.tmin,
@@ -220,6 +383,17 @@ class ModelDomain:
         if not use_crop_coefficients:
             self.crop_coefficient = np.ones_like(self.crop_coefficient)
 
+    def calc_reference_et(self) -> None:
+        """Calculate reference evapotranspiration"""
+        if self.current_date is None:
+            raise RuntimeError("Current date must be set before calculating reference ET")
+
+        self.reference_et0 = self.potential_et_calculator.calculate(
+            date=self.current_date,
+            tmin=self.tmin,
+            tmax=self.tmax
+        )
+
     def initialize_routing(self, flow_direction: NDArray[np.int32],
                            routing_fraction: Optional[NDArray[np.float32]] = None) -> None:
         """Initialize routing configuration"""
@@ -232,6 +406,29 @@ class ModelDomain:
         self._create_flow_sequence()
         self.routing_enabled = True
 
+    def _create_flow_sequence(self) -> None:
+        """Create sequence of cell indices from upslope to downslope"""
+        n_cells = len(self.flow_direction)
+        visited = np.zeros(n_cells, dtype=bool)
+        sequence = []
+
+        for i in range(n_cells):
+            if not visited[i]:
+                self._trace_flow_path(i, visited, sequence)
+
+        self.flow_sequence = np.array(sequence, dtype=np.int32)
+
+    def _trace_flow_path(self, cell: int, visited: NDArray[np.bool_],
+                         sequence: List[int]) -> None:
+        """Recursively trace flow path from a cell"""
+        visited[cell] = True
+        next_cell = self.flow_direction[cell]
+
+        if next_cell >= 0 and not visited[next_cell]:
+            self._trace_flow_path(next_cell, visited, sequence)
+
+        sequence.append(cell)
+
     def cleanup(self) -> None:
         """Clean up model resources"""
         self.logger.info("Cleaning up model resources")
@@ -239,14 +436,9 @@ class ModelDomain:
         try:
             # Clean up modules
             modules = [
-                'runoff_module',
-                'agriculture_module',
-                'actual_et_calculator',
-                'interception_module',
-                'infiltration_module',
-                'soil_module',
-                'weather_module',
-                'potential_et_calculator'
+                'runoff_module', 'agriculture_module', 'actual_et_calculator',
+                'interception_module', 'infiltration_module', 'soil_module',
+                'weather_module', 'potential_et_calculator'
             ]
 
             for module_name in modules:
@@ -270,249 +462,26 @@ class ModelDomain:
             self.logger.error(f"Error during cleanup: {str(e)}")
             raise
 
-    def _initialize_arrays(self) -> None:
-        """Initialize empty arrays"""
-        # These will be properly sized during grid initialization
-        self.surface_storage = None
-        self.snow_storage = None
-        self.interception_storage = None
-        self.soil_storage = None
-        self.soil_storage_max = None
-        self.gross_precip = None
-        self.rainfall = None
-        self.snowfall = None
-        self.runoff = None
-        self.infiltration = None
-        self.reference_et0 = None
-        self.actual_et = None
-        self.tmin = None
-        self.tmax = None
-        self.tmean = None
-        self.crop_coefficient = None
-        self.rooting_depth = None
-
-    def _initialize_domain_arrays(self) -> None:
-        """Initialize domain arrays to proper size"""
-        n_active = np.count_nonzero(self.active)
-
-        # Initialize all arrays to proper size
-        self.surface_storage = np.zeros(n_active, dtype=np.float32)
-        self.snow_storage = np.zeros(n_active, dtype=np.float32)
-        self.interception_storage = np.zeros(n_active, dtype=np.float32)
-        self.soil_storage = np.zeros(n_active, dtype=np.float32)
-        self.soil_storage_max = np.zeros(n_active, dtype=np.float32)
-        self.gross_precip = np.zeros(n_active, dtype=np.float32)
-        self.rainfall = np.zeros(n_active, dtype=np.float32)
-        self.snowfall = np.zeros(n_active, dtype=np.float32)
-        self.runoff = np.zeros(n_active, dtype=np.float32)
-        self.infiltration = np.zeros(n_active, dtype=np.float32)
-        self.reference_et0 = np.zeros(n_active, dtype=np.float32)
-        self.actual_et = np.zeros(n_active, dtype=np.float32)
-        self.tmin = np.zeros(n_active, dtype=np.float32)
-        self.tmax = np.zeros(n_active, dtype=np.float32)
-        self.tmean = np.zeros(n_active, dtype=np.float32)
-        self.crop_coefficient = np.ones(n_active, dtype=np.float32)
-        self.rooting_depth = np.zeros(n_active, dtype=np.float32)
-
-    def _initialize_modules(self) -> None:
-        """Initialize all model modules"""
-        self.runoff_module = RunoffModule(self.domain_size)
-        self.agriculture_module = AgricultureModule(self.domain_size)
-        self.actual_et_calculator = ActualETCalculator(self.domain_size)
-        self.interception_module = InterceptionModule(self.domain_size)
-        self.infiltration_module = InfiltrationModule(self.domain_size)
-        self.soil_module = SoilModule(self.domain_size)
-        self.weather_module = WeatherModule(self.domain_size, (self.number_of_rows, self.number_of_columns))
-        self.potential_et_calculator = PotentialETCalculator(self.domain_size)
-
-    def _validate_landuse_parameters(self, params: Dict[int, Dict]) -> None:
-        """Validate landuse parameters"""
-        required_modules = ['runoff', 'crop', 'interception']
-        for landuse_id, landuse_params in params.items():
-            missing = [m for m in required_modules if m not in landuse_params]
-            if missing:
-                raise ValueError(
-                    f"Missing required parameter modules for landuse {landuse_id}: {missing}"
-                )
-
-    def _validate_soil_parameters(self, params: Dict[int, Dict]) -> None:
-        """Validate soil parameters"""
-        required_modules = ['infiltration', 'soil']
-        for soil_id, soil_params in params.items():
-            missing = [m for m in required_modules if m not in soil_params]
-            if missing:
-                raise ValueError(
-                    f"Missing required parameter modules for soil {soil_id}: {missing}"
-                )
-
-    def _update_time_dependent_parameters(self) -> None:
-        """Update time-dependent parameters"""
-        if self.current_date is None:
-            return
-
-        if self.agriculture_module is not None:
-            self.agriculture_module.update_growing_season(self.tmean)
-
-        if self.current_date.day == 1:
-            self._update_monthly_parameters()
-
-    def _update_monthly_parameters(self) -> None:
-        """Update any monthly parameters"""
-        # Implementation depends on which parameters vary monthly
-        pass
-
-    def _create_flow_sequence(self) -> None:
-        """Create sequence of cell indices from upslope to downslope"""
-        n_cells = len(self.flow_direction)
-        visited = np.zeros(n_cells, dtype=bool)
-        sequence = []
-
-        # Process each unvisited cell
-        for i in range(n_cells):
-            if not visited[i]:
-                self._trace_flow_path(i, visited, sequence)
-
-        # Store final sequence
-        self.flow_sequence = np.array(sequence, dtype=np.int32)
-
-    def _trace_flow_path(self, cell: int, visited: NDArray[np.bool_],
-                         sequence: List[int]) -> None:
-        """Recursively trace flow path from a cell"""
-        # Mark current cell as visited
-        visited[cell] = True
-
-        # Get next downslope cell
-        next_cell = self.flow_direction[cell]
-
-        # Follow flow path if valid cell and not already visited
-        if next_cell >= 0 and not visited[next_cell]:
-            self._trace_flow_path(next_cell, visited, sequence)
-
-        # Add current cell to sequence
-        sequence.append(cell)
-
     def _clear_arrays(self) -> None:
         """Clear memory by setting arrays to None"""
-        array_attrs = [
-            'surface_storage',
-            'snow_storage',
-            'interception_storage',
-            'soil_storage',
-            'soil_storage_max',
-            'gross_precip',
-            'rainfall',
-            'snowfall',
-            'runoff',
-            'infiltration',
-            'reference_et0',
-            'actual_et',
-            'tmin',
-            'tmax',
-            'tmean',
-            'crop_coefficient',
-            'rooting_depth'
+        array_names = [
+            'surface_storage', 'snow_storage', 'interception_storage',
+            'soil_storage', 'soil_storage_max', 'gross_precip',
+            'rainfall', 'snowfall', 'net_rainfall', 'net_snowfall',
+            'fog', 'runoff', 'runon', 'infiltration', 'net_infiltration',
+            'potential_snowmelt', 'snowmelt', 'direct_net_infiltration',
+            'direct_soil_moisture', 'reference_et0', 'actual_et',
+            'actual_et_interception', 'crop_etc', 'interception',
+            'interception_storage', 'interception_storage_max',
+            'tmin', 'tmax', 'tmean', 'crop_coefficient', 'rooting_depth',
+            'wilting_point', 'field_capacity', 'available_water_content',
+            'landuse_indices', 'soil_indices', 'flow_direction',
+            'flow_sequence', 'routing_fraction', 'active'
         ]
 
-        for attr in array_attrs:
-            if hasattr(self, attr):
-                setattr(self, attr, None)
-
-    def initialize_output(self, directory: Path, prefix: str,
-                          variables: List[str], compression: bool = True) -> None:
-        """Initialize output configuration"""
-        if not self.is_initialized:
-            raise RuntimeError("Domain must be initialized before configuring output")
-
-        self.output_dir = directory
-        directory.mkdir(parents=True, exist_ok=True)
-
-        self.output_prefix = prefix
-        self.output_variables = variables
-        self.output_compression = compression
-
-        # Initialize output metadata for each variable
-        self.output_metadata = {}
-        for var in variables:
-            if hasattr(self, var.lower()):
-                self.output_metadata[var] = {
-                    'units': self._get_variable_units(var),
-                    'description': self._get_variable_description(var),
-                    'missing_value': -9999.0
-                }
-
-        self.output_initialized = True
-        self.logger.info("Output configuration initialized")
-
-    def _get_variable_units(self, variable: str) -> str:
-        """Get units for a given variable"""
-        units_map = {
-            'precipitation': 'inches',
-            'rainfall': 'inches',
-            'snowfall': 'inches',
-            'runoff': 'inches',
-            'infiltration': 'inches',
-            'soil_storage': 'inches',
-            'reference_et0': 'inches',
-            'actual_et': 'inches',
-            'tmin': 'degrees F',
-            'tmax': 'degrees F',
-            'tmean': 'degrees F',
-            'crop_coefficient': 'dimensionless',
-            'rooting_depth': 'inches'
-        }
-        return units_map.get(variable.lower(), 'unknown')
-
-    def _get_variable_description(self, variable: str) -> str:
-        """Get description for a given variable"""
-        description_map = {
-            'precipitation': 'Total precipitation',
-            'rainfall': 'Rainfall component of precipitation',
-            'snowfall': 'Snowfall component of precipitation',
-            'runoff': 'Surface water runoff',
-            'infiltration': 'Water infiltration into soil',
-            'soil_storage': 'Soil water storage',
-            'reference_et0': 'Reference evapotranspiration',
-            'actual_et': 'Actual evapotranspiration',
-            'tmin': 'Minimum daily temperature',
-            'tmax': 'Maximum daily temperature',
-            'tmean': 'Mean daily temperature',
-            'crop_coefficient': 'Crop coefficient',
-            'rooting_depth': 'Root zone depth'
-        }
-        return description_map.get(variable.lower(), 'No description available')
-
-    def calc_reference_et(self) -> None:
-        """Calculate reference evapotranspiration"""
-        if self.current_date is None:
-            raise RuntimeError("Current date must be set before calculating reference ET")
-
-        self.reference_et0 = self.potential_et_calculator.calculate(
-            date=self.current_date,
-            tmin=self.tmin,
-            tmax=self.tmax
-        )
-
-    def process_timestep(self, date: datetime) -> None:
-        """Process model state for current timestep"""
-        if not self.is_initialized:
-            raise RuntimeError("Model must be initialized before processing timesteps")
-
-        # Update date
-        self.update_date(date)
-
-        # Get weather data
-        self.get_weather_data(date)
-
-        # Calculate reference ET
-        self.calc_reference_et()
-
-        # Update crop coefficients if using FAO-56
-        if self.use_crop_coefficients:
-            self.agriculture_module.update_crop_coefficients()
-
-        # Update rooting depth if using dynamic rooting
-        if self.dynamic_rooting:
-            self.agriculture_module.update_root_depth()
+        for name in array_names:
+            if hasattr(self, name):
+                setattr(self, name, None)
 
     def get_current_state(self) -> Dict[str, NDArray]:
         """Get current state of model variables"""
@@ -532,7 +501,9 @@ class ModelDomain:
             'tmax': self.tmax,
             'tmean': self.tmean,
             'crop_coefficient': self.crop_coefficient,
-            'rooting_depth': self.rooting_depth
+            'rooting_depth': self.rooting_depth,
+            'net_infiltration': self.net_infiltration,
+            'direct_soil_moisture': self.direct_soil_moisture
         }
 
     @property
@@ -543,3 +514,44 @@ class ModelDomain:
                 self.output_initialized and
                 self.start_date is not None and
                 self.end_date is not None)
+
+    def validate_state(self) -> None:
+        """Validate model state arrays for consistency"""
+        if not self.is_initialized:
+            raise RuntimeError("Model must be initialized before validation")
+
+        # Check array sizes
+        expected_size = self.domain_size
+        array_sizes = {
+            name: getattr(self, name).size
+            for name in dir(self)
+            if isinstance(getattr(self, name), np.ndarray)
+        }
+
+        mismatched = {
+            name: size for name, size in array_sizes.items()
+            if size != expected_size
+        }
+
+        if mismatched:
+            raise ValueError(
+                f"Array size mismatch. Expected {expected_size}, "
+                f"but found: {mismatched}"
+            )
+
+    def reset_state(self) -> None:
+        """Reset model state arrays to initial values"""
+        self.logger.info("Resetting model state")
+
+        # Re-initialize arrays
+        self._initialize_arrays()
+        self._initialize_domain_arrays()
+
+        # Reset modules if they exist
+        if hasattr(self, 'agriculture_module') and self.agriculture_module is not None:
+            self.agriculture_module.reset()
+        if hasattr(self, 'weather_module') and self.weather_module is not None:
+            self.weather_module.reset()
+
+        # Reset date
+        self.current_date = self.start_date

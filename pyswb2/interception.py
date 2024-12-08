@@ -71,6 +71,7 @@ class InterceptionModule:
             
         # Set initial storage max based on season
         self._update_storage_max_by_season(np.zeros_like(landuse_indices, dtype=bool))
+
         
     def add_gash_parameters(self, landuse_id: int, params: GashParameters) -> None:
         """Add or update Gash parameters for a landuse type

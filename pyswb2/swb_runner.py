@@ -1,10 +1,11 @@
 from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Union, List, Any
+from typing import Dict, Optional, Union, List, Any, Generator
 import numpy as np
 from dataclasses import dataclass
 import logging
-
+from contextlib import contextmanager
+import netCDF4 as nc
 from .configuration import ConfigurationManager, ModelConfig
 from .model_domain import ModelDomain
 from .grid import Grid, GridDataType
@@ -342,6 +343,251 @@ class SWBModelRunner:
             for var in self.config.output.variables:
                 if var in state:
                     ds.variables[var][:] = state[var]
+
+    def _get_output_metadata(self) -> Dict[str, Dict[str, Any]]:
+        """Get metadata for all possible output variables"""
+        metadata = {
+            # Water Balance Components
+            'gross_precipitation': {
+                'units': 'inches',
+                'long_name': 'Gross Precipitation',
+                'description': 'Total precipitation before interception'
+            },
+            'rainfall': {
+                'units': 'inches',
+                'long_name': 'Rainfall',
+                'description': 'Liquid precipitation'
+            },
+            'snowfall': {
+                'units': 'inches',
+                'long_name': 'Snowfall',
+                'description': 'Frozen precipitation'
+            },
+            'interception': {
+                'units': 'inches',
+                'long_name': 'Canopy Interception',
+                'description': 'Precipitation intercepted by canopy'
+            },
+            'runon': {
+                'units': 'inches',
+                'long_name': 'Run-on',
+                'description': 'Surface water run-on from upslope cells'
+            },
+            'runoff': {
+                'units': 'inches',
+                'long_name': 'Surface Runoff',
+                'description': 'Surface water runoff'
+            },
+            'runoff_outside': {
+                'units': 'inches',
+                'long_name': 'Runoff Outside Domain',
+                'description': 'Surface runoff leaving the model domain'
+            },
+
+            # Soil Water Components
+            'infiltration': {
+                'units': 'inches',
+                'long_name': 'Infiltration',
+                'description': 'Water infiltration into soil'
+            },
+            'net_infiltration': {
+                'units': 'inches',
+                'long_name': 'Net Infiltration',
+                'description': 'Net water infiltration after losses'
+            },
+            'rejected_net_infiltration': {
+                'units': 'inches',
+                'long_name': 'Rejected Net Infiltration',
+                'description': 'Infiltration rejected due to soil storage limitations'
+            },
+            'soil_storage': {
+                'units': 'inches',
+                'long_name': 'Soil Moisture Storage',
+                'description': 'Water stored in soil profile'
+            },
+            'delta_soil_storage': {
+                'units': 'inches',
+                'long_name': 'Change in Soil Storage',
+                'description': 'Daily change in soil moisture storage'
+            },
+
+            # ET Components
+            'reference_et0': {
+                'units': 'inches',
+                'long_name': 'Reference ET',
+                'description': 'Reference evapotranspiration'
+            },
+            'actual_et': {
+                'units': 'inches',
+                'long_name': 'Actual ET',
+                'description': 'Actual evapotranspiration'
+            },
+            'crop_et': {
+                'units': 'inches',
+                'long_name': 'Crop ET',
+                'description': 'Crop-specific evapotranspiration'
+            },
+
+            # Temperature Components
+            'tmin': {
+                'units': 'degrees F',
+                'long_name': 'Minimum Temperature',
+                'description': 'Daily minimum temperature'
+            },
+            'tmax': {
+                'units': 'degrees F',
+                'long_name': 'Maximum Temperature',
+                'description': 'Daily maximum temperature'
+            },
+
+            # Snow Components
+            'snow_storage': {
+                'units': 'inches',
+                'long_name': 'Snow Storage',
+                'description': 'Water equivalent of stored snow'
+            },
+            'snowmelt': {
+                'units': 'inches',
+                'long_name': 'Snowmelt',
+                'description': 'Daily snowmelt'
+            },
+
+            # Growing Degree Days
+            'gdd': {
+                'units': 'degrees F',
+                'long_name': 'Growing Degree Days',
+                'description': 'Accumulated growing degree days'
+            },
+
+            # Direct Recharge Components
+            'direct_net_infiltation': {  # Note: maintaining original spelling from error
+                'units': 'inches',
+                'long_name': 'Direct Net Infiltration',
+                'description': 'Direct infiltration from specific sources'
+            },
+            'direct_soil_moisture': {
+                'units': 'inches',
+                'long_name': 'Direct Soil Moisture',
+                'description': 'Direct additions to soil moisture'
+            },
+
+            # Irrigation
+            'irrigation': {
+                'units': 'inches',
+                'long_name': 'Irrigation',
+                'description': 'Applied irrigation water'
+            }
+        }
+        return metadata
+
+    @contextmanager
+    def _get_output_file(self, path: Path) -> Generator[nc.Dataset, None, None]:
+        """Create and manage NetCDF output file with error handling"""
+        try:
+            # Create output directory if needed
+            path.parent.mkdir(parents=True, exist_ok=True)
+
+            # Open NetCDF file
+            ds = nc.Dataset(path, 'w', format='NETCDF4')
+
+            try:
+                # Create dimensions
+                ds.createDimension('y', self.config.grid.ny)
+                ds.createDimension('x', self.config.grid.nx)
+                ds.createDimension('time', None)  # Unlimited dimension
+
+                # Create coordinate variables
+                x = ds.createVariable('x', 'f8', ('x',))
+                y = ds.createVariable('y', 'f8', ('y',))
+                time = ds.createVariable('time', 'f8', ('time',))
+
+                # Set coordinate values
+                x[:] = np.linspace(
+                    self.config.grid.x0,
+                    self.config.grid.x0 + self.config.grid.nx * self.config.grid.cell_size,
+                    self.config.grid.nx
+                )
+                y[:] = np.linspace(
+                    self.config.grid.y0,
+                    self.config.grid.y0 + self.config.grid.ny * self.config.grid.cell_size,
+                    self.config.grid.ny
+                )
+
+                # Set time units and attributes
+                time.units = f'days since {self.config.start_date.strftime("%Y-%m-%d")}'
+                time.calendar = 'standard'
+
+                # Add global attributes
+                ds.description = 'SWB Model Output'
+                ds.history = f'Created {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+                ds.source = 'pySWB2 Model'
+                ds.proj4 = self.config.grid.proj4_string
+                ds.model_version = '2.0'
+
+                # Create variables for configured outputs
+                metadata = self._get_output_metadata()
+                for var in self.config.output.variables:
+                    if var.lower() in metadata:  # Case-insensitive matching
+                        var_meta = metadata[var.lower()]
+                        v = ds.createVariable(
+                            var,
+                            'f4',
+                            ('time', 'y', 'x'),
+                            zlib=self.config.output.compression,
+                            fill_value=-9999.0,
+                            least_significant_digit=3
+                        )
+                        # Add variable metadata
+                        for key, value in var_meta.items():
+                            setattr(v, key, value)
+                    else:
+                        # Create variable without metadata if not in metadata dictionary
+                        self.logger.warning(f"No metadata found for variable {var}, creating with defaults")
+                        v = ds.createVariable(
+                            var,
+                            'f4',
+                            ('time', 'y', 'x'),
+                            zlib=self.config.output.compression,
+                            fill_value=-9999.0
+                        )
+
+                yield ds
+
+            finally:
+                ds.close()
+
+        except Exception as e:
+            self.logger.error(f"Error creating output file {path}: {str(e)}")
+            raise
+
+    def _write_output(self, date: datetime) -> None:
+        """Write output for current timestep"""
+        try:
+            # Calculate time index
+            time_index = (date - self.config.start_date).days
+
+            # Get output path
+            output_path = (self.config.output.directory /
+                           f"{self.config.output.prefix}_{date:%Y%m%d}.nc")
+
+            # Get current state
+            state = self.domain.get_current_state()
+
+            # Write output
+            with self._get_output_file(output_path) as ds:
+                # Set time value
+                ds.variables['time'][time_index] = time_index
+
+                # Write each configured variable
+                for var in self.config.output.variables:
+                    if var in state:
+                        # Reshape flattened array to grid dimensions
+                        grid_data = state[var].reshape(self.config.grid.ny, self.config.grid.nx)
+                        ds.variables[var][time_index, :, :] = grid_data
+
+        except Exception as e:
+            self.logger.error(f"Failed to write output for {date}: {str(e)}")
+            raise
 
     def cleanup(self):
         """Clean up model resources"""

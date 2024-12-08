@@ -312,3 +312,605 @@
 2024-12-07 20:04:39,503 - parameters - INFO - Cleaning up model resources
 2024-12-07 20:04:39,504 - parameters - INFO - Cleaning up model resources
 2024-12-07 20:04:39,504 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:19:52,027 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 22:19:52,031 - parameters - INFO - Loading input data
+2024-12-07 22:19:52,031 - parameters - INFO - Loading input data
+2024-12-07 22:19:52,031 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:19:52,031 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:19:52,265 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:19:52,265 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:19:52,538 - parameters - INFO - Initializing model grid
+2024-12-07 22:19:52,538 - parameters - INFO - Initializing model grid
+2024-12-07 22:19:52,540 - parameters - INFO - Initializing model grid
+2024-12-07 22:19:52,540 - parameters - INFO - Initializing model grid
+2024-12-07 22:19:52,554 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:19:52,554 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:19:52,556 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:19:52,556 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:19:52,559 - parameters - INFO - Processing soil parameters
+2024-12-07 22:19:52,559 - parameters - INFO - Processing soil parameters
+2024-12-07 22:19:52,560 - parameters - INFO - Initializing model parameters
+2024-12-07 22:19:52,560 - parameters - INFO - Initializing model parameters
+2024-12-07 22:19:52,562 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:19:52,562 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:19:52,564 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:19:52,564 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:19:52,565 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:19:52,565 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:19:52,566 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:19:52,566 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:19:52,568 - parameters - INFO - Elevation: 66360
+2024-12-07 22:19:52,568 - parameters - INFO - Elevation: 66360
+2024-12-07 22:19:52,569 - parameters - INFO - Latitude: 66360
+2024-12-07 22:19:52,569 - parameters - INFO - Latitude: 66360
+2024-12-07 22:19:52,570 - parameters - INFO - Initializing model modules
+2024-12-07 22:19:52,570 - parameters - INFO - Initializing model modules
+2024-12-07 22:19:52,630 - parameters - INFO - Module initialization complete
+2024-12-07 22:19:52,630 - parameters - INFO - Module initialization complete
+2024-12-07 22:19:52,631 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:19:52,631 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:19:52,633 - parameters - INFO - Initializing output configuration
+2024-12-07 22:19:52,633 - parameters - INFO - Initializing output configuration
+2024-12-07 22:19:52,634 - parameters - INFO - Output configuration initialized
+2024-12-07 22:19:52,634 - parameters - INFO - Output configuration initialized
+2024-12-07 22:19:52,636 - parameters - INFO - Model initialization complete
+2024-12-07 22:19:52,636 - parameters - INFO - Model initialization complete
+2024-12-07 22:19:52,637 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:19:52,637 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:19:52,644 - parameters - ERROR - Simulation failed: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+2024-12-07 22:19:52,644 - parameters - ERROR - Simulation failed: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+2024-12-07 22:19:52,645 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:19:52,645 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:19:52,646 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:19:52,646 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:26:28,456 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 22:26:28,461 - parameters - INFO - Loading input data
+2024-12-07 22:26:28,461 - parameters - INFO - Loading input data
+2024-12-07 22:26:28,464 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:26:28,464 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:26:28,754 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:26:28,754 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:26:28,992 - parameters - INFO - Initializing model grid
+2024-12-07 22:26:28,992 - parameters - INFO - Initializing model grid
+2024-12-07 22:26:28,993 - parameters - INFO - Initializing model grid
+2024-12-07 22:26:28,993 - parameters - INFO - Initializing model grid
+2024-12-07 22:26:29,006 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:26:29,006 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:26:29,008 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:26:29,008 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:26:29,011 - parameters - INFO - Processing soil parameters
+2024-12-07 22:26:29,011 - parameters - INFO - Processing soil parameters
+2024-12-07 22:26:29,012 - parameters - INFO - Initializing model parameters
+2024-12-07 22:26:29,012 - parameters - INFO - Initializing model parameters
+2024-12-07 22:26:29,014 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:26:29,014 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:26:29,016 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:26:29,016 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:26:29,018 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:26:29,018 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:26:29,020 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:26:29,020 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:26:29,023 - parameters - INFO - Elevation: 66360
+2024-12-07 22:26:29,023 - parameters - INFO - Elevation: 66360
+2024-12-07 22:26:29,024 - parameters - INFO - Latitude: 66360
+2024-12-07 22:26:29,024 - parameters - INFO - Latitude: 66360
+2024-12-07 22:26:29,026 - parameters - INFO - Initializing model modules
+2024-12-07 22:26:29,026 - parameters - INFO - Initializing model modules
+2024-12-07 22:26:29,079 - parameters - INFO - Module initialization complete
+2024-12-07 22:26:29,079 - parameters - INFO - Module initialization complete
+2024-12-07 22:26:29,080 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:26:29,080 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:26:29,082 - parameters - INFO - Initializing output configuration
+2024-12-07 22:26:29,082 - parameters - INFO - Initializing output configuration
+2024-12-07 22:26:29,084 - parameters - INFO - Output configuration initialized
+2024-12-07 22:26:29,084 - parameters - INFO - Output configuration initialized
+2024-12-07 22:26:29,086 - parameters - INFO - Model initialization complete
+2024-12-07 22:26:29,086 - parameters - INFO - Model initialization complete
+2024-12-07 22:26:29,089 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:26:29,089 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:26:29,096 - parameters - ERROR - Simulation failed: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+2024-12-07 22:26:29,096 - parameters - ERROR - Simulation failed: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+2024-12-07 22:26:29,098 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:26:29,098 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:26:29,099 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:26:29,099 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:26:45,155 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 22:26:45,158 - parameters - INFO - Loading input data
+2024-12-07 22:26:45,158 - parameters - INFO - Loading input data
+2024-12-07 22:26:45,160 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:26:45,160 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:26:45,434 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:26:45,434 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:26:45,716 - parameters - INFO - Initializing model grid
+2024-12-07 22:26:45,716 - parameters - INFO - Initializing model grid
+2024-12-07 22:26:45,717 - parameters - INFO - Initializing model grid
+2024-12-07 22:26:45,717 - parameters - INFO - Initializing model grid
+2024-12-07 22:26:45,729 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:26:45,729 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:26:45,730 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:26:45,730 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:26:45,732 - parameters - INFO - Processing soil parameters
+2024-12-07 22:26:45,732 - parameters - INFO - Processing soil parameters
+2024-12-07 22:26:45,733 - parameters - INFO - Initializing model parameters
+2024-12-07 22:26:45,733 - parameters - INFO - Initializing model parameters
+2024-12-07 22:26:45,735 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:26:45,735 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:26:45,736 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:26:45,736 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:26:45,738 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:26:45,738 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:26:45,739 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:26:45,739 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:26:45,740 - parameters - INFO - Elevation: 66360
+2024-12-07 22:26:45,740 - parameters - INFO - Elevation: 66360
+2024-12-07 22:26:45,741 - parameters - INFO - Latitude: 66360
+2024-12-07 22:26:45,741 - parameters - INFO - Latitude: 66360
+2024-12-07 22:26:45,743 - parameters - INFO - Initializing model modules
+2024-12-07 22:26:45,743 - parameters - INFO - Initializing model modules
+2024-12-07 22:26:45,806 - parameters - INFO - Module initialization complete
+2024-12-07 22:26:45,806 - parameters - INFO - Module initialization complete
+2024-12-07 22:26:45,807 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:26:45,807 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:26:45,809 - parameters - INFO - Initializing output configuration
+2024-12-07 22:26:45,809 - parameters - INFO - Initializing output configuration
+2024-12-07 22:26:45,811 - parameters - INFO - Output configuration initialized
+2024-12-07 22:26:45,811 - parameters - INFO - Output configuration initialized
+2024-12-07 22:26:45,813 - parameters - INFO - Model initialization complete
+2024-12-07 22:26:45,813 - parameters - INFO - Model initialization complete
+2024-12-07 22:26:45,815 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:26:45,815 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:26:45,822 - parameters - ERROR - Simulation failed: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+2024-12-07 22:26:45,822 - parameters - ERROR - Simulation failed: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+2024-12-07 22:26:45,823 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:26:45,823 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:26:45,824 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:26:45,824 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:31:49,382 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 22:31:49,385 - parameters - INFO - Loading input data
+2024-12-07 22:31:49,385 - parameters - INFO - Loading input data
+2024-12-07 22:31:49,387 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:31:49,387 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:31:49,646 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:31:49,646 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:31:49,923 - parameters - INFO - Initializing model grid
+2024-12-07 22:31:49,923 - parameters - INFO - Initializing model grid
+2024-12-07 22:31:49,924 - parameters - INFO - Initializing model grid
+2024-12-07 22:31:49,924 - parameters - INFO - Initializing model grid
+2024-12-07 22:31:49,937 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:31:49,937 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:31:49,938 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:31:49,938 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:31:49,941 - parameters - INFO - Processing soil parameters
+2024-12-07 22:31:49,941 - parameters - INFO - Processing soil parameters
+2024-12-07 22:31:49,942 - parameters - INFO - Initializing model parameters
+2024-12-07 22:31:49,942 - parameters - INFO - Initializing model parameters
+2024-12-07 22:31:49,944 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:31:49,944 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:31:49,946 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:31:49,946 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:31:49,947 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:31:49,947 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:31:49,949 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:31:49,949 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:31:49,951 - parameters - INFO - Elevation: 66360
+2024-12-07 22:31:49,951 - parameters - INFO - Elevation: 66360
+2024-12-07 22:31:49,952 - parameters - INFO - Latitude: 66360
+2024-12-07 22:31:49,952 - parameters - INFO - Latitude: 66360
+2024-12-07 22:31:49,953 - parameters - INFO - Initializing model modules
+2024-12-07 22:31:49,953 - parameters - INFO - Initializing model modules
+2024-12-07 22:31:50,024 - parameters - INFO - Module initialization complete
+2024-12-07 22:31:50,024 - parameters - INFO - Module initialization complete
+2024-12-07 22:31:50,025 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:31:50,025 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:31:50,026 - parameters - INFO - Initializing output configuration
+2024-12-07 22:31:50,026 - parameters - INFO - Initializing output configuration
+2024-12-07 22:31:50,028 - parameters - INFO - Output configuration initialized
+2024-12-07 22:31:50,028 - parameters - INFO - Output configuration initialized
+2024-12-07 22:31:50,029 - parameters - INFO - Model initialization complete
+2024-12-07 22:31:50,029 - parameters - INFO - Model initialization complete
+2024-12-07 22:31:50,030 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:31:50,030 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:31:50,048 - parameters - ERROR - Simulation failed: 'ModelDomain' object has no attribute 'gross_precipitation'
+2024-12-07 22:31:50,048 - parameters - ERROR - Simulation failed: 'ModelDomain' object has no attribute 'gross_precipitation'
+2024-12-07 22:31:50,049 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:31:50,049 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:31:50,051 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:31:50,051 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:37:51,607 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 22:37:51,610 - parameters - INFO - Loading input data
+2024-12-07 22:37:51,610 - parameters - INFO - Loading input data
+2024-12-07 22:37:51,612 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:37:51,612 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:37:51,872 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:37:51,872 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:37:52,097 - parameters - INFO - Initializing model grid
+2024-12-07 22:37:52,097 - parameters - INFO - Initializing model grid
+2024-12-07 22:37:52,098 - parameters - INFO - Initializing model grid
+2024-12-07 22:37:52,098 - parameters - INFO - Initializing model grid
+2024-12-07 22:37:52,111 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:37:52,111 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:37:52,112 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:37:52,112 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:37:52,115 - parameters - INFO - Processing soil parameters
+2024-12-07 22:37:52,115 - parameters - INFO - Processing soil parameters
+2024-12-07 22:37:52,116 - parameters - INFO - Initializing model parameters
+2024-12-07 22:37:52,116 - parameters - INFO - Initializing model parameters
+2024-12-07 22:37:52,118 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:37:52,118 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:37:52,119 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:37:52,119 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:37:52,120 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:37:52,120 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:37:52,121 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:37:52,121 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:37:52,122 - parameters - INFO - Elevation: 66360
+2024-12-07 22:37:52,122 - parameters - INFO - Elevation: 66360
+2024-12-07 22:37:52,123 - parameters - INFO - Latitude: 66360
+2024-12-07 22:37:52,123 - parameters - INFO - Latitude: 66360
+2024-12-07 22:37:52,124 - parameters - INFO - Initializing model modules
+2024-12-07 22:37:52,124 - parameters - INFO - Initializing model modules
+2024-12-07 22:37:52,176 - parameters - INFO - Module initialization complete
+2024-12-07 22:37:52,176 - parameters - INFO - Module initialization complete
+2024-12-07 22:37:52,177 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:37:52,177 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:37:52,178 - parameters - INFO - Initializing output configuration
+2024-12-07 22:37:52,178 - parameters - INFO - Initializing output configuration
+2024-12-07 22:37:52,180 - parameters - INFO - Output configuration initialized
+2024-12-07 22:37:52,180 - parameters - INFO - Output configuration initialized
+2024-12-07 22:37:52,181 - parameters - INFO - Model initialization complete
+2024-12-07 22:37:52,181 - parameters - INFO - Model initialization complete
+2024-12-07 22:37:52,182 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:37:52,182 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:37:52,199 - parameters - ERROR - Simulation failed: 'ModelDomain' object has no attribute 'fog'
+2024-12-07 22:37:52,199 - parameters - ERROR - Simulation failed: 'ModelDomain' object has no attribute 'fog'
+2024-12-07 22:37:52,201 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:37:52,201 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:37:52,202 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:37:52,202 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:43:22,770 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 22:43:22,774 - parameters - INFO - Loading input data
+2024-12-07 22:43:22,774 - parameters - INFO - Loading input data
+2024-12-07 22:43:22,775 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:43:22,775 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:43:23,016 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:43:23,016 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:43:23,256 - parameters - INFO - Initializing model grid
+2024-12-07 22:43:23,256 - parameters - INFO - Initializing model grid
+2024-12-07 22:43:23,258 - parameters - INFO - Initializing model grid
+2024-12-07 22:43:23,258 - parameters - INFO - Initializing model grid
+2024-12-07 22:43:23,264 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:43:23,264 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:43:23,265 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:43:23,265 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:43:23,267 - parameters - INFO - Processing soil parameters
+2024-12-07 22:43:23,267 - parameters - INFO - Processing soil parameters
+2024-12-07 22:43:23,268 - parameters - INFO - Initializing model parameters
+2024-12-07 22:43:23,268 - parameters - INFO - Initializing model parameters
+2024-12-07 22:43:23,279 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:43:23,279 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:43:23,280 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:43:23,280 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:43:23,281 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:43:23,281 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:43:23,282 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:43:23,282 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:43:23,283 - parameters - INFO - Elevation: 66360
+2024-12-07 22:43:23,283 - parameters - INFO - Elevation: 66360
+2024-12-07 22:43:23,285 - parameters - INFO - Latitude: 66360
+2024-12-07 22:43:23,285 - parameters - INFO - Latitude: 66360
+2024-12-07 22:43:23,286 - parameters - INFO - Initializing model modules
+2024-12-07 22:43:23,286 - parameters - INFO - Initializing model modules
+2024-12-07 22:43:23,334 - parameters - INFO - Module initialization complete
+2024-12-07 22:43:23,334 - parameters - INFO - Module initialization complete
+2024-12-07 22:43:23,335 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:43:23,335 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:43:23,336 - parameters - INFO - Initializing output configuration
+2024-12-07 22:43:23,336 - parameters - INFO - Initializing output configuration
+2024-12-07 22:43:23,339 - parameters - INFO - Output configuration initialized
+2024-12-07 22:43:23,339 - parameters - INFO - Output configuration initialized
+2024-12-07 22:43:23,340 - parameters - INFO - Model initialization complete
+2024-12-07 22:43:23,340 - parameters - INFO - Model initialization complete
+2024-12-07 22:43:23,341 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:43:23,341 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:43:23,352 - parameters - ERROR - Simulation failed: Module must be initialized before calculations
+2024-12-07 22:43:23,352 - parameters - ERROR - Simulation failed: Module must be initialized before calculations
+2024-12-07 22:43:23,353 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:43:23,353 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:43:23,354 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:43:23,354 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:47:22,180 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 22:47:22,184 - parameters - INFO - Loading input data
+2024-12-07 22:47:22,184 - parameters - INFO - Loading input data
+2024-12-07 22:47:22,186 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:47:22,186 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:47:22,493 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:47:22,493 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:47:22,747 - parameters - INFO - Initializing model grid
+2024-12-07 22:47:22,747 - parameters - INFO - Initializing model grid
+2024-12-07 22:47:22,748 - parameters - INFO - Initializing model grid
+2024-12-07 22:47:22,748 - parameters - INFO - Initializing model grid
+2024-12-07 22:47:22,753 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:47:22,753 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:47:22,754 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:47:22,754 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:47:22,757 - parameters - INFO - Processing soil parameters
+2024-12-07 22:47:22,757 - parameters - INFO - Processing soil parameters
+2024-12-07 22:47:22,758 - parameters - INFO - Initializing model parameters
+2024-12-07 22:47:22,758 - parameters - INFO - Initializing model parameters
+2024-12-07 22:47:22,768 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:47:22,768 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:47:22,770 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:47:22,770 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:47:22,771 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:47:22,771 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:47:22,772 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:47:22,772 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:47:22,773 - parameters - INFO - Elevation: 66360
+2024-12-07 22:47:22,773 - parameters - INFO - Elevation: 66360
+2024-12-07 22:47:22,774 - parameters - INFO - Latitude: 66360
+2024-12-07 22:47:22,774 - parameters - INFO - Latitude: 66360
+2024-12-07 22:47:22,776 - parameters - INFO - Initializing model modules
+2024-12-07 22:47:22,776 - parameters - INFO - Initializing model modules
+2024-12-07 22:47:22,835 - parameters - ERROR - Module initialization failed: 'ActualETCalculator' object has no attribute 'initialize'
+2024-12-07 22:47:22,835 - parameters - ERROR - Module initialization failed: 'ActualETCalculator' object has no attribute 'initialize'
+2024-12-07 22:47:22,837 - parameters - ERROR - Initialization failed: 'ActualETCalculator' object has no attribute 'initialize'
+2024-12-07 22:47:22,837 - parameters - ERROR - Initialization failed: 'ActualETCalculator' object has no attribute 'initialize'
+2024-12-07 22:51:29,096 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 22:51:29,099 - parameters - INFO - Loading input data
+2024-12-07 22:51:29,099 - parameters - INFO - Loading input data
+2024-12-07 22:51:29,100 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:51:29,100 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 22:51:29,333 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:51:29,333 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 22:51:29,580 - parameters - INFO - Initializing model grid
+2024-12-07 22:51:29,580 - parameters - INFO - Initializing model grid
+2024-12-07 22:51:29,582 - parameters - INFO - Initializing model grid
+2024-12-07 22:51:29,582 - parameters - INFO - Initializing model grid
+2024-12-07 22:51:29,587 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:51:29,587 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 22:51:29,588 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:51:29,588 - parameters - INFO - Processing landuse parameters
+2024-12-07 22:51:29,592 - parameters - INFO - Processing soil parameters
+2024-12-07 22:51:29,592 - parameters - INFO - Processing soil parameters
+2024-12-07 22:51:29,592 - parameters - INFO - Initializing model parameters
+2024-12-07 22:51:29,592 - parameters - INFO - Initializing model parameters
+2024-12-07 22:51:29,605 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:51:29,605 - parameters - INFO - Parameter initialization complete
+2024-12-07 22:51:29,606 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:51:29,606 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 22:51:29,607 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:51:29,607 - parameters - INFO - Landuse indices: 66360
+2024-12-07 22:51:29,609 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:51:29,609 - parameters - INFO - Soil indices: 66360
+2024-12-07 22:51:29,611 - parameters - INFO - Elevation: 66360
+2024-12-07 22:51:29,611 - parameters - INFO - Elevation: 66360
+2024-12-07 22:51:29,612 - parameters - INFO - Latitude: 66360
+2024-12-07 22:51:29,612 - parameters - INFO - Latitude: 66360
+2024-12-07 22:51:29,613 - parameters - INFO - Initializing model modules
+2024-12-07 22:51:29,613 - parameters - INFO - Initializing model modules
+2024-12-07 22:51:29,662 - parameters - INFO - Module initialization complete
+2024-12-07 22:51:29,662 - parameters - INFO - Module initialization complete
+2024-12-07 22:51:29,663 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:51:29,663 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:51:29,664 - parameters - INFO - Initializing output configuration
+2024-12-07 22:51:29,664 - parameters - INFO - Initializing output configuration
+2024-12-07 22:51:29,666 - parameters - INFO - Output configuration initialized
+2024-12-07 22:51:29,666 - parameters - INFO - Output configuration initialized
+2024-12-07 22:51:29,667 - parameters - INFO - Model initialization complete
+2024-12-07 22:51:29,667 - parameters - INFO - Model initialization complete
+2024-12-07 22:51:29,668 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:51:29,668 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 22:51:29,702 - parameters - ERROR - Simulation failed: np.int32(0)
+2024-12-07 22:51:29,702 - parameters - ERROR - Simulation failed: np.int32(0)
+2024-12-07 22:51:29,703 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:51:29,703 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:51:29,705 - parameters - INFO - Cleaning up model resources
+2024-12-07 22:51:29,705 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:01:01,179 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 23:01:01,183 - parameters - INFO - Loading input data
+2024-12-07 23:01:01,183 - parameters - INFO - Loading input data
+2024-12-07 23:01:01,184 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 23:01:01,184 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 23:01:01,513 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 23:01:01,513 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 23:01:01,766 - parameters - INFO - Initializing model grid
+2024-12-07 23:01:01,766 - parameters - INFO - Initializing model grid
+2024-12-07 23:01:01,767 - parameters - INFO - Initializing model grid
+2024-12-07 23:01:01,767 - parameters - INFO - Initializing model grid
+2024-12-07 23:01:01,772 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 23:01:01,772 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 23:01:01,774 - parameters - INFO - Processing landuse parameters
+2024-12-07 23:01:01,774 - parameters - INFO - Processing landuse parameters
+2024-12-07 23:01:01,776 - parameters - INFO - Processing soil parameters
+2024-12-07 23:01:01,776 - parameters - INFO - Processing soil parameters
+2024-12-07 23:01:01,778 - parameters - INFO - Initializing model parameters
+2024-12-07 23:01:01,778 - parameters - INFO - Initializing model parameters
+2024-12-07 23:01:01,788 - parameters - INFO - Parameter initialization complete
+2024-12-07 23:01:01,788 - parameters - INFO - Parameter initialization complete
+2024-12-07 23:01:01,789 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 23:01:01,789 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 23:01:01,791 - parameters - INFO - Landuse indices: 66360
+2024-12-07 23:01:01,791 - parameters - INFO - Landuse indices: 66360
+2024-12-07 23:01:01,793 - parameters - INFO - Soil indices: 66360
+2024-12-07 23:01:01,793 - parameters - INFO - Soil indices: 66360
+2024-12-07 23:01:01,794 - parameters - INFO - Elevation: 66360
+2024-12-07 23:01:01,794 - parameters - INFO - Elevation: 66360
+2024-12-07 23:01:01,796 - parameters - INFO - Latitude: 66360
+2024-12-07 23:01:01,796 - parameters - INFO - Latitude: 66360
+2024-12-07 23:01:01,797 - parameters - INFO - Initializing model modules
+2024-12-07 23:01:01,797 - parameters - INFO - Initializing model modules
+2024-12-07 23:01:01,858 - parameters - INFO - Module initialization complete
+2024-12-07 23:01:01,858 - parameters - INFO - Module initialization complete
+2024-12-07 23:01:01,859 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:01:01,859 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:01:01,860 - parameters - INFO - Initializing output configuration
+2024-12-07 23:01:01,860 - parameters - INFO - Initializing output configuration
+2024-12-07 23:01:01,862 - parameters - INFO - Output configuration initialized
+2024-12-07 23:01:01,862 - parameters - INFO - Output configuration initialized
+2024-12-07 23:01:01,864 - parameters - INFO - Model initialization complete
+2024-12-07 23:01:01,864 - parameters - INFO - Model initialization complete
+2024-12-07 23:01:01,864 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:01:01,864 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:01:01,894 - parameters - ERROR - Simulation failed: unsupported operand type(s) for -: 'float' and 'NoneType'
+2024-12-07 23:01:01,894 - parameters - ERROR - Simulation failed: unsupported operand type(s) for -: 'float' and 'NoneType'
+2024-12-07 23:01:01,895 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:01:01,895 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:01:01,896 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:01:01,896 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:08:00,087 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 23:08:00,091 - parameters - INFO - Loading input data
+2024-12-07 23:08:00,091 - parameters - INFO - Loading input data
+2024-12-07 23:08:00,092 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 23:08:00,092 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 23:08:00,366 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 23:08:00,366 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 23:08:00,651 - parameters - INFO - Initializing model grid
+2024-12-07 23:08:00,651 - parameters - INFO - Initializing model grid
+2024-12-07 23:08:00,652 - parameters - INFO - Initializing model grid
+2024-12-07 23:08:00,652 - parameters - INFO - Initializing model grid
+2024-12-07 23:08:00,658 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 23:08:00,658 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 23:08:00,660 - parameters - INFO - Processing landuse parameters
+2024-12-07 23:08:00,660 - parameters - INFO - Processing landuse parameters
+2024-12-07 23:08:00,662 - parameters - INFO - Processing soil parameters
+2024-12-07 23:08:00,662 - parameters - INFO - Processing soil parameters
+2024-12-07 23:08:00,663 - parameters - INFO - Initializing model parameters
+2024-12-07 23:08:00,663 - parameters - INFO - Initializing model parameters
+2024-12-07 23:08:00,676 - parameters - INFO - Parameter initialization complete
+2024-12-07 23:08:00,676 - parameters - INFO - Parameter initialization complete
+2024-12-07 23:08:00,677 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 23:08:00,677 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 23:08:00,678 - parameters - INFO - Landuse indices: 66360
+2024-12-07 23:08:00,678 - parameters - INFO - Landuse indices: 66360
+2024-12-07 23:08:00,679 - parameters - INFO - Soil indices: 66360
+2024-12-07 23:08:00,679 - parameters - INFO - Soil indices: 66360
+2024-12-07 23:08:00,680 - parameters - INFO - Elevation: 66360
+2024-12-07 23:08:00,680 - parameters - INFO - Elevation: 66360
+2024-12-07 23:08:00,682 - parameters - INFO - Latitude: 66360
+2024-12-07 23:08:00,682 - parameters - INFO - Latitude: 66360
+2024-12-07 23:08:00,683 - parameters - INFO - Initializing model modules
+2024-12-07 23:08:00,683 - parameters - INFO - Initializing model modules
+2024-12-07 23:08:00,733 - parameters - INFO - Module initialization complete
+2024-12-07 23:08:00,733 - parameters - INFO - Module initialization complete
+2024-12-07 23:08:00,734 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:08:00,734 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:08:00,735 - parameters - INFO - Initializing output configuration
+2024-12-07 23:08:00,735 - parameters - INFO - Initializing output configuration
+2024-12-07 23:08:00,737 - parameters - INFO - Output configuration initialized
+2024-12-07 23:08:00,737 - parameters - INFO - Output configuration initialized
+2024-12-07 23:08:00,739 - parameters - INFO - Model initialization complete
+2024-12-07 23:08:00,739 - parameters - INFO - Model initialization complete
+2024-12-07 23:08:00,740 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:08:00,740 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:08:01,101 - parameters - ERROR - Simulation failed: 'SWBModelRunner' object has no attribute '_get_output_file'
+2024-12-07 23:08:01,101 - parameters - ERROR - Simulation failed: 'SWBModelRunner' object has no attribute '_get_output_file'
+2024-12-07 23:08:01,103 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:08:01,103 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:08:01,104 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:08:01,104 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:13:25,457 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 23:13:25,461 - parameters - INFO - Loading input data
+2024-12-07 23:13:25,461 - parameters - INFO - Loading input data
+2024-12-07 23:13:25,462 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 23:13:25,462 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 23:13:25,740 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 23:13:25,740 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 23:13:25,980 - parameters - INFO - Initializing model grid
+2024-12-07 23:13:25,980 - parameters - INFO - Initializing model grid
+2024-12-07 23:13:25,981 - parameters - INFO - Initializing model grid
+2024-12-07 23:13:25,981 - parameters - INFO - Initializing model grid
+2024-12-07 23:13:25,986 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 23:13:25,986 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 23:13:25,987 - parameters - INFO - Processing landuse parameters
+2024-12-07 23:13:25,987 - parameters - INFO - Processing landuse parameters
+2024-12-07 23:13:25,990 - parameters - INFO - Processing soil parameters
+2024-12-07 23:13:25,990 - parameters - INFO - Processing soil parameters
+2024-12-07 23:13:25,991 - parameters - INFO - Initializing model parameters
+2024-12-07 23:13:25,991 - parameters - INFO - Initializing model parameters
+2024-12-07 23:13:26,004 - parameters - INFO - Parameter initialization complete
+2024-12-07 23:13:26,004 - parameters - INFO - Parameter initialization complete
+2024-12-07 23:13:26,005 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 23:13:26,005 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 23:13:26,007 - parameters - INFO - Landuse indices: 66360
+2024-12-07 23:13:26,007 - parameters - INFO - Landuse indices: 66360
+2024-12-07 23:13:26,008 - parameters - INFO - Soil indices: 66360
+2024-12-07 23:13:26,008 - parameters - INFO - Soil indices: 66360
+2024-12-07 23:13:26,010 - parameters - INFO - Elevation: 66360
+2024-12-07 23:13:26,010 - parameters - INFO - Elevation: 66360
+2024-12-07 23:13:26,011 - parameters - INFO - Latitude: 66360
+2024-12-07 23:13:26,011 - parameters - INFO - Latitude: 66360
+2024-12-07 23:13:26,013 - parameters - INFO - Initializing model modules
+2024-12-07 23:13:26,013 - parameters - INFO - Initializing model modules
+2024-12-07 23:13:26,068 - parameters - INFO - Module initialization complete
+2024-12-07 23:13:26,068 - parameters - INFO - Module initialization complete
+2024-12-07 23:13:26,069 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:13:26,069 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:13:26,071 - parameters - INFO - Initializing output configuration
+2024-12-07 23:13:26,071 - parameters - INFO - Initializing output configuration
+2024-12-07 23:13:26,072 - parameters - INFO - Output configuration initialized
+2024-12-07 23:13:26,072 - parameters - INFO - Output configuration initialized
+2024-12-07 23:13:26,074 - parameters - INFO - Model initialization complete
+2024-12-07 23:13:26,074 - parameters - INFO - Model initialization complete
+2024-12-07 23:13:26,075 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:13:26,075 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:13:26,527 - parameters - ERROR - Error creating output file output\_20010101.nc: 'net_infiltration'
+2024-12-07 23:13:26,527 - parameters - ERROR - Error creating output file output\_20010101.nc: 'net_infiltration'
+2024-12-07 23:13:26,528 - parameters - ERROR - Failed to write output for 2001-01-01 00:00:00: 'net_infiltration'
+2024-12-07 23:13:26,528 - parameters - ERROR - Failed to write output for 2001-01-01 00:00:00: 'net_infiltration'
+2024-12-07 23:13:26,529 - parameters - ERROR - Simulation failed: 'net_infiltration'
+2024-12-07 23:13:26,529 - parameters - ERROR - Simulation failed: 'net_infiltration'
+2024-12-07 23:13:26,530 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:13:26,530 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:13:26,531 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:13:26,531 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:18:39,491 - parameters - INFO - Initializing SWB model with config: maui_swb2.ctl
+2024-12-07 23:18:39,496 - parameters - INFO - Loading input data
+2024-12-07 23:18:39,496 - parameters - INFO - Loading input data
+2024-12-07 23:18:39,497 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 23:18:39,497 - parameters - INFO - Loading and aligning grid: input\LU2010_w_2_season_sugarcane__simulation_1__50m.asc
+2024-12-07 23:18:39,749 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 23:18:39,749 - parameters - INFO - Loading and aligning grid: input\maui_HYDROLOGIC_SOILS_GROUP__50m.asc
+2024-12-07 23:18:40,003 - parameters - INFO - Initializing model grid
+2024-12-07 23:18:40,003 - parameters - INFO - Initializing model grid
+2024-12-07 23:18:40,004 - parameters - INFO - Initializing model grid
+2024-12-07 23:18:40,004 - parameters - INFO - Initializing model grid
+2024-12-07 23:18:40,010 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 23:18:40,010 - parameters - INFO - Grid initialized: 316x210 cells
+2024-12-07 23:18:40,011 - parameters - INFO - Processing landuse parameters
+2024-12-07 23:18:40,011 - parameters - INFO - Processing landuse parameters
+2024-12-07 23:18:40,014 - parameters - INFO - Processing soil parameters
+2024-12-07 23:18:40,014 - parameters - INFO - Processing soil parameters
+2024-12-07 23:18:40,015 - parameters - INFO - Initializing model parameters
+2024-12-07 23:18:40,015 - parameters - INFO - Initializing model parameters
+2024-12-07 23:18:40,026 - parameters - INFO - Parameter initialization complete
+2024-12-07 23:18:40,026 - parameters - INFO - Parameter initialization complete
+2024-12-07 23:18:40,027 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 23:18:40,027 - parameters - INFO - Verifying array sizes (should be 66360):
+2024-12-07 23:18:40,028 - parameters - INFO - Landuse indices: 66360
+2024-12-07 23:18:40,028 - parameters - INFO - Landuse indices: 66360
+2024-12-07 23:18:40,030 - parameters - INFO - Soil indices: 66360
+2024-12-07 23:18:40,030 - parameters - INFO - Soil indices: 66360
+2024-12-07 23:18:40,031 - parameters - INFO - Elevation: 66360
+2024-12-07 23:18:40,031 - parameters - INFO - Elevation: 66360
+2024-12-07 23:18:40,032 - parameters - INFO - Latitude: 66360
+2024-12-07 23:18:40,032 - parameters - INFO - Latitude: 66360
+2024-12-07 23:18:40,034 - parameters - INFO - Initializing model modules
+2024-12-07 23:18:40,034 - parameters - INFO - Initializing model modules
+2024-12-07 23:18:40,088 - parameters - INFO - Module initialization complete
+2024-12-07 23:18:40,088 - parameters - INFO - Module initialization complete
+2024-12-07 23:18:40,089 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:18:40,089 - parameters - INFO - Simulation period: 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:18:40,090 - parameters - INFO - Initializing output configuration
+2024-12-07 23:18:40,090 - parameters - INFO - Initializing output configuration
+2024-12-07 23:18:40,092 - parameters - INFO - Output configuration initialized
+2024-12-07 23:18:40,092 - parameters - INFO - Output configuration initialized
+2024-12-07 23:18:40,093 - parameters - INFO - Model initialization complete
+2024-12-07 23:18:40,093 - parameters - INFO - Model initialization complete
+2024-12-07 23:18:40,094 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:18:40,094 - parameters - INFO - Starting simulation from 2001-01-01 00:00:00 to 2002-12-31 00:00:00
+2024-12-07 23:23:19,664 - parameters - INFO - Simulation completed successfully
+2024-12-07 23:23:19,664 - parameters - INFO - Simulation completed successfully
+2024-12-07 23:23:19,666 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:23:19,666 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:23:19,668 - parameters - INFO - Cleaning up model resources
+2024-12-07 23:23:19,668 - parameters - INFO - Cleaning up model resources

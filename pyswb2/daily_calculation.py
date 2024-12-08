@@ -1,18 +1,19 @@
-from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Dict, List, Optional, Union
 import numpy as np
 from numpy.typing import NDArray
 import logging
-
-from .model_domain import ModelDomain
-
 
 
 class DailyCalculation:
     """Class handling daily water balance calculations following documented order"""
 
     def __init__(self, domain):
+        """Initialize daily calculation module
+
+        Args:
+            domain: ModelDomain instance containing state variables and modules
+        """
         self.domain = domain
         self.logger = logging.getLogger('daily_calculation')
 
@@ -38,7 +39,7 @@ class DailyCalculation:
         # 5. Calculate soil moisture balance
         self._process_soil_moisture()
 
-        # 6. Calculate water routing
+        # 6. Calculate water routing if enabled
         if self.domain.routing_enabled:
             self._process_routing()
 
@@ -52,8 +53,10 @@ class DailyCalculation:
         daily_range = (self.domain.tmax - self.domain.tmin) / 3.0
 
         snow_mask = (tmean - daily_range) <= 32.0
-        self.domain.snowfall[snow_mask] = self.domain.gross_precipitation[snow_mask]
-        self.domain.rainfall[~snow_mask] = self.domain.gross_precipitation[~snow_mask]
+
+        # Partition precipitation based on temperature
+        self.domain.snowfall[snow_mask] = self.domain.gross_precip[snow_mask]
+        self.domain.rainfall[~snow_mask] = self.domain.gross_precip[~snow_mask]
 
         # Track net amounts after interception
         self.domain.net_snowfall = self.domain.snowfall.copy()
@@ -159,7 +162,15 @@ class DailyCalculation:
             soil_storage_max=self.domain.soil_storage_max,
             infiltration=self.domain.infiltration,
             crop_etc=self.domain.crop_etc,
-            reference_et0=self.domain.reference_et0
+            reference_et0=self.domain.reference_et0,
+            **{
+                'kcb': self.domain.crop_coefficient,
+                'landuse_indices': self.domain.landuse_indices,
+                'soil_group': self.domain.soil_indices,
+                'awc': self.domain.available_water_content,
+                'current_rooting_depth': self.domain.rooting_depth,
+                'is_growing_season': self.domain.agriculture_module.is_growing_season
+            }
         )
 
         # Update soil moisture
@@ -186,16 +197,17 @@ class DailyCalculation:
 
     def _process_routing(self) -> None:
         """Route surface water based on flow direction"""
-        # Initialize routing
+        # Initialize routing arrays
         self.domain.runoff_outside = np.zeros_like(self.domain.runoff)
         self.domain.runon = np.zeros_like(self.domain.runoff)
 
-        # Process cells in flow order
+        # Process cells in flow sequence order
         for idx in self.domain.flow_sequence:
-            # Get downslope cell
+            # Get downslope cell index
             next_idx = self.domain.flow_direction[idx]
 
-            if next_idx == -1:  # No valid downslope cell
+            # Check if there's a valid downslope cell
+            if next_idx == -1:
                 self.domain.runoff_outside[idx] = self.domain.runoff[idx]
                 continue
 
@@ -232,4 +244,3 @@ class DailyCalculation:
         # Update crop coefficients if using FAO-56
         if self.domain.use_crop_coefficients:
             self.domain.agriculture_module.update_crop_coefficients()
-

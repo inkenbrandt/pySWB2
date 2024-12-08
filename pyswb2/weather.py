@@ -114,10 +114,10 @@ class WeatherModule:
         self.tmin = base_tmin - temp_adjustment + self.adjustments.temperature_bias
         self.tmax = base_tmax - temp_adjustment + self.adjustments.temperature_bias
         self.tmean = (self.tmin + self.tmax) / 2.0
-        
+
     def process_precipitation(self, date: datetime, interception: NDArray[np.float32]) -> None:
         """Process precipitation calculations for current timestep
-        
+
         Args:
             date: Current simulation date
             interception: Canopy interception array
@@ -129,36 +129,40 @@ class WeatherModule:
             tmax=self.tmax,
             interception=interception
         )
-        
+
         # Apply elevation adjustments if configured
-        if abs(self.grid_params.precip_gradient) > 1e-6:
+        if hasattr(self, 'grid_params') and abs(self.grid_params.precip_gradient) > 1e-6:
             base_elevation = np.mean(self.elevation)
             elevation_diff = (self.elevation - base_elevation) / 1000.0
             precip_adjustment = elevation_diff * self.grid_params.precip_gradient
-            
-            # Adjust each component
+
+            # Adjust gross precipitation
             self.current_precip_data.gross_precip += precip_adjustment
-            if self.tmax <= 32.0:  # If below freezing, add to snowfall
-                self.current_precip_data.snowfall += precip_adjustment
-            else:  # Otherwise add to rainfall
-                self.current_precip_data.rainfall += precip_adjustment
-                
+
+            # Adjust rainfall/snowfall based on temperature
+            snow_mask = self.tmax <= 32.0
+            self.current_precip_data.snowfall[snow_mask] += precip_adjustment[snow_mask]
+            self.current_precip_data.rainfall[~snow_mask] += precip_adjustment[~snow_mask]
+
             # Recalculate net values
-            self.current_precip_data.net_snowfall = max(
-                0.0, self.current_precip_data.snowfall - interception)
-            self.current_precip_data.net_rainfall = max(
-                0.0, self.current_precip_data.rainfall - interception)
-            
-        # Apply minimum threshold
-        if self.current_precip_data.gross_precip < self.adjustments.minimum_precip:
-            self.current_precip_data = PrecipitationData(
-                date=date,
-                gross_precip=0.0,
-                rainfall=0.0,
-                snowfall=0.0,
-                net_rainfall=0.0,
-                net_snowfall=0.0
+            self.current_precip_data.net_snowfall = np.maximum(
+                0.0,
+                self.current_precip_data.snowfall - interception
             )
+            self.current_precip_data.net_rainfall = np.maximum(
+                0.0,
+                self.current_precip_data.rainfall - interception
+            )
+
+        # Apply minimum threshold using array operations
+        precip_mask = self.current_precip_data.gross_precip < self.adjustments.minimum_precip
+        if np.any(precip_mask):
+            # Zero out precipitation only where it's below threshold
+            self.current_precip_data.gross_precip[precip_mask] = 0.0
+            self.current_precip_data.rainfall[precip_mask] = 0.0
+            self.current_precip_data.snowfall[precip_mask] = 0.0
+            self.current_precip_data.net_rainfall[precip_mask] = 0.0
+            self.current_precip_data.net_snowfall[precip_mask] = 0.0
             
     def calculate_snowmelt(self) -> NDArray[np.float32]:
         """Calculate potential snowmelt based on temperature"""
