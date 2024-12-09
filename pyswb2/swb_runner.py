@@ -2,10 +2,14 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Dict, Optional, Union, List, Any, Generator
 import numpy as np
+from numpy.typing import NDArray
 from dataclasses import dataclass
 import logging
 from contextlib import contextmanager
 import netCDF4 as nc
+import numba
+from numpy.lib.stride_tricks import as_strided
+
 from .configuration import ConfigurationManager, ModelConfig
 from .model_domain import ModelDomain
 from .grid import Grid, GridDataType
@@ -13,6 +17,277 @@ from .daily_calculation import DailyCalculation
 from .logging_config import ParameterLogger
 from .grid_clipper import GridClipper, GridExtent, GridFormat  # Import the existing utility
 from .runoff_diagnostics import RunoffDiagnostics
+
+
+class OptimizedSWBRunner:
+    """Optimized version of SWB model runner with original config support"""
+
+    def __init__(self, config_path: Path, log_dir: Optional[Path] = None):
+        """Initialize with memory-efficient design using original config"""
+        self.logger = logging.getLogger('swb_runner')
+        self.logger.info(f"Initializing optimized SWB model with config: {config_path}")
+
+        # Load configuration using original ConfigurationManager
+        self.config_manager = ConfigurationManager()
+        self.config = self.config_manager.load(config_path)
+
+        # Initialize grid clipper with existing parameters
+        target_extent = GridExtent(
+            xmin=self.config.grid.x0,
+            ymin=self.config.grid.y0,
+            xmax=self.config.grid.x0 + self.config.grid.nx * self.config.grid.cell_size,
+            ymax=self.config.grid.y0 + self.config.grid.ny * self.config.grid.cell_size,
+            cell_size=self.config.grid.cell_size,
+            nx=self.config.grid.nx,
+            ny=self.config.grid.ny
+        )
+        self.grid_clipper = GridClipper(target_extent)
+
+        # Use memory-mapped arrays for large grids
+        self._initialize_memmap_arrays()
+
+        # Create views instead of copies for grid operations
+        self.grid_views = {}
+
+        # Initialize modules with optimized implementations
+        self._initialize_optimized_modules()
+
+    def _initialize_memmap_arrays(self) -> None:
+        """Initialize memory-mapped arrays for large grids"""
+        # Use tempfile module for platform-independent temp directory
+        import tempfile
+        import os
+
+        tmp_dir = Path(tempfile.gettempdir()) / "swb_arrays"
+        tmp_dir.mkdir(exist_ok=True)
+
+        array_shape = (self.config.grid.ny, self.config.grid.nx)
+
+        # Create memory-mapped arrays for main grids
+        self.landuse_indices = np.memmap(tmp_dir / "landuse.dat", dtype=np.int32,
+                                         mode='w+', shape=array_shape)
+        self.soil_indices = np.memmap(tmp_dir / "soils.dat", dtype=np.int32,
+                                      mode='w+', shape=array_shape)
+        self.elevation = np.memmap(tmp_dir / "elevation.dat", dtype=np.float32,
+                                   mode='w+', shape=array_shape)
+
+        # Processing arrays in Fortran order for efficiency
+        self.processing_arrays = {
+            'runoff': np.zeros(array_shape, dtype=np.float32, order='F'),
+            'infiltration': np.zeros(array_shape, dtype=np.float32, order='F'),
+            'soil_moisture': np.zeros(array_shape, dtype=np.float32, order='F')
+        }
+
+    def _initialize_optimized_modules(self) -> None:
+        """Initialize optimized processing modules"""
+        domain_size = self.config.grid.nx * self.config.grid.ny
+
+        # Initialize weather module
+        self.weather_module = WeatherModule(
+            domain_size=domain_size,
+            grid_shape=(self.config.grid.ny, self.config.grid.nx)
+        )
+
+        # Initialize runoff module
+        self.runoff_module = RunoffModule(domain_size)
+
+        # Initialize soil module
+        self.soil_module = SoilModule(domain_size)
+
+        # Initialize ET calculator
+        self.et_calculator = ETCalculator(domain_size)
+
+        # Grid operations
+        self.grid_ops = GridOperations(
+            nx=self.config.grid.nx,
+            ny=self.config.grid.ny
+        )
+
+        # Track initialization
+        self.modules_initialized = True
+
+    def _load_input_data(self) -> None:
+        """Load and align input data using grid clipper"""
+        self.logger.info("Loading input data")
+
+        try:
+            # Load landuse and soils using existing grid clipper
+            landuse_grid = self._load_grid(self.config.input.landuse_grid)
+            soils_grid = self._load_grid(self.config.input.hydrologic_soils_group)
+
+            # Convert to indices directly into memory-mapped arrays
+            self.landuse_indices[:] = landuse_grid.astype(np.int32)
+            self.soil_indices[:] = soils_grid.astype(np.int32)
+
+            # Initialize elevation with default values
+            self.elevation.fill(0.0)
+
+        except Exception as e:
+            self.logger.error(f"Failed to load input data: {str(e)}")
+            raise
+
+    def _load_grid(self, path: Path) -> np.ndarray:
+        """Load and align grid data using grid clipper"""
+        self.logger.info(f"Loading and aligning grid: {path}")
+
+        try:
+            # Process using grid clipper
+            output_path = path.parent / f"aligned_{path.name}"
+            self.grid_clipper.process_file(
+                input_path=path,
+                output_path=output_path,
+                method='nearest',
+                fill_value=-9999
+            )
+
+            # Read aligned data
+            data, _ = self.grid_clipper.read_grid(output_path)
+
+            # Verify shape
+            if data.shape != (self.config.grid.ny, self.config.grid.nx):
+                raise ValueError(f"Grid shape {data.shape} doesn't match expected "
+                                 f"({self.config.grid.ny}, {self.config.grid.nx})")
+
+            # Clean up temporary file
+            if output_path.exists():
+                output_path.unlink()
+
+            return data
+
+        except Exception as e:
+            self.logger.error(f"Failed to load grid {path}: {str(e)}")
+            raise
+
+    def initialize(self) -> None:
+        """Initialize model using original configuration order"""
+        try:
+            # Load input data
+            self._load_input_data()
+
+            # Initialize modules
+            self._initialize_modules()
+
+            # Initialize output
+            self._initialize_output()
+
+            self.is_initialized = True
+            self.logger.info("Model initialization complete")
+
+        except Exception as e:
+            self.logger.error(f"Initialization failed: {str(e)}")
+            raise
+
+    @staticmethod
+    @numba.jit(nopython=True, parallel=True)
+    def _process_cell_block(runoff: np.ndarray, infiltration: np.ndarray,
+                            soil_moisture: np.ndarray, precipitation: np.ndarray,
+                            curve_numbers: np.ndarray) -> None:
+        """Numba-optimized cell block processing"""
+        rows, cols = runoff.shape
+        for i in numba.prange(rows):
+            for j in range(cols):
+                # Calculate runoff using optimized SCS method
+                S = 1000.0 / curve_numbers[i, j] - 10.0
+                Ia = 0.2 * S
+                P = precipitation[i, j]
+
+                if P > Ia:
+                    runoff[i, j] = (P - Ia) ** 2 / (P - Ia + S)
+                else:
+                    runoff[i, j] = 0.0
+
+                # Calculate infiltration
+                infiltration[i, j] = P - runoff[i, j]
+
+                # Update soil moisture
+                soil_moisture[i, j] += infiltration[i, j]
+
+    def process_timestep(self, date: datetime) -> None:
+        """Process single timestep with memory-efficient blocks"""
+        block_size = min(1000, self.config.grid.ny)
+
+        for start_row in range(0, self.config.grid.ny, block_size):
+            end_row = min(start_row + block_size, self.config.grid.ny)
+            block_slice = slice(start_row, end_row)
+
+            # Process block
+            current_block = {
+                name: arr[block_slice, :]
+                for name, arr in self.processing_arrays.items()
+            }
+
+            self._process_cell_block(
+                current_block['runoff'],
+                current_block['infiltration'],
+                current_block['soil_moisture'],
+                self.get_precipitation_block(block_slice),
+                self.get_curve_numbers_block(block_slice)
+            )
+
+            if self.config.output.write_daily:
+                self._write_block_output(date, block_slice, current_block)
+
+    def _write_block_output(self, date: datetime, block_slice: slice,
+                            block_data: Dict[str, np.ndarray]) -> None:
+        """Write output block to NetCDF"""
+        time_index = (date - self.config.start_date).days
+
+        for var_name, data in block_data.items():
+            if var_name in self.config.output.variables:
+                with self._get_output_file(var_name) as ds:
+                    ds.variables[var_name][time_index, block_slice, :] = data
+
+    @contextmanager
+    def _get_output_file(self, var_name: str):
+        """Context manager for NetCDF file access"""
+        try:
+            ds = nc.Dataset(self.get_output_path(var_name), 'a')
+            yield ds
+        finally:
+            ds.close()
+
+    def cleanup(self) -> None:
+        """Clean up memory-mapped arrays and temporary files"""
+        # Close and delete memory-mapped arrays
+        for arr_name in ['landuse_indices', 'soil_indices', 'elevation']:
+            if hasattr(self, arr_name):
+                arr = getattr(self, arr_name)
+                if hasattr(arr, '_mmap'):
+                    arr._mmap.close()
+                del arr
+
+        # Remove temporary files
+        tmp_dir = Path("/tmp/swb_arrays")
+        if tmp_dir.exists():
+            for f in tmp_dir.glob("*.dat"):
+                f.unlink()
+            tmp_dir.rmdir()
+
+        # Clean up original resources
+        if hasattr(self, 'domain'):
+            self.domain.cleanup()
+
+    def run(self) -> None:
+        """Run model simulation"""
+        if not self.is_initialized:
+            raise RuntimeError("Model must be initialized before running")
+
+        self.logger.info(f"Starting simulation from {self.config.start_date} "
+                         f"to {self.config.end_date}")
+
+        try:
+            current_date = self.config.start_date
+            while current_date <= self.config.end_date:
+                self.process_timestep(current_date)
+                current_date += timedelta(days=1)
+
+            self.logger.info("Simulation completed successfully")
+
+        except Exception as e:
+            self.logger.error(f"Simulation failed: {str(e)}")
+            raise
+        finally:
+            self.cleanup()
 
 class SWBModelRunner:
     """Main runner class for SWB model with input validation"""
@@ -723,6 +998,16 @@ class SWBModelRunner:
 def run_swb_model(config_path: Path, log_dir: Optional[Path] = None) -> None:
     """Convenience function to run SWB model"""
     runner = SWBModelRunner(config_path, log_dir)
+    try:
+        runner.initialize()
+        runner.run()
+    except Exception as e:
+        logging.error(f"Model run failed: {str(e)}")
+        raise
+
+def run_opt_swb_model(config_path: Path, log_dir: Optional[Path] = None) -> None:
+    """Convenience function to run SWB model"""
+    runner = OptimizedSWBRunner(config_path, log_dir)
     try:
         runner.initialize()
         runner.run()
