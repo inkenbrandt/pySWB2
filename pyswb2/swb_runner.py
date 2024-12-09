@@ -12,7 +12,7 @@ from .grid import Grid, GridDataType
 from .daily_calculation import DailyCalculation
 from .logging_config import ParameterLogger
 from .grid_clipper import GridClipper, GridExtent, GridFormat  # Import the existing utility
-
+from .runoff_diagnostics import RunoffDiagnostics
 
 class SWBModelRunner:
     """Main runner class for SWB model with input validation"""
@@ -50,6 +50,8 @@ class SWBModelRunner:
 
         # State tracking
         self.is_initialized = False
+
+        self.runoff_diagnostics = RunoffDiagnostics(self.logger)
 
     def _load_grid(self, path: Path) -> np.ndarray:
         """Load and align grid data using grid clipper utility"""
@@ -460,8 +462,13 @@ class SWBModelRunner:
         # Get weather data first
         self.domain.get_weather_data(date)
 
+        # Collect and log runoff diagnostics
+        diagnostics = self.runoff_diagnostics.collect_diagnostics(self.domain, date)
+        self.runoff_diagnostics.log_diagnostics(diagnostics)
+
         # Run daily calculations
         self.daily_calc.perform_daily_calculation(date)
+
 
         # Write output if configured
         if self.config.output.write_daily:
